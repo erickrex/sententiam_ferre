@@ -1,0 +1,76 @@
+/* Mobile-first navigation styles */
+.navigation {
+  background-color: #2c3e50;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.nav-brand {
+  color: white;
+  text-decoration: none;
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-right: 1rem;
+}
+
+.nav-links {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.nav-link {
+  color: white;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  font-size: 1rem;
+  /* Ensure touch targets are at least 44x44px */
+  min-height: 44px;
+  min-width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.nav-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.nav-username {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  padding: 0.5rem;
+}
+
+/* Tablet and desktop */
+@media (min-width: 768px) {
+  .nav-brand {
+    font-size: 1.5rem;
+  }
+  
+  .nav-links {
+    gap: 1.5rem;
+  }
+  
+  .nav-username {
+    font-size: 1rem;
+  }
+}

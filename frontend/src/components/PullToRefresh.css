@@ -1,0 +1,67 @@
+.pull-to-refresh-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.pull-to-refresh-indicator {
+  position: absolute;
+  top: -80px;
+  left: 0;
+  right: 0;
+  height: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.8));
+  z-index: 100;
+  transition: opacity 0.2s ease;
+}
+
+.refresh-spinner {
+  width: 32px;
+  height: 32px;
+  color: #646cff;
+  transition: transform 0.3s ease;
+}
+
+.refresh-spinner.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.refresh-text {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #666;
+}
+
+.pull-to-refresh-content {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .pull-to-refresh-indicator {
+    background: linear-gradient(to bottom, rgba(26, 26, 26, 0.95), rgba(26, 26, 26, 0.8));
+  }
+  
+  .refresh-spinner {
+    color: #8b95ff;
+  }
+  
+  .refresh-text {
+    color: rgba(255, 255, 255, 0.6);
+  }
+}

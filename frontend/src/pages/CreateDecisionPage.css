@@ -1,0 +1,17 @@
+.create-decision-page {
+  min-height: calc(100vh - 60px);
+  background-color: #f8f9fa;
+  padding: 2rem 1rem;
+}
+
+.page-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .create-decision-page {
+    padding: 1rem 0.5rem;
+  }
+}

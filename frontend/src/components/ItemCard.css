@@ -1,0 +1,98 @@
+.item-card {
+  position: absolute;
+  width: 90%;
+  max-width: 400px;
+  height: 500px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+
+.item-card:active {
+  cursor: grabbing;
+}
+
+.item-card-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.item-card-image {
+  width: 100%;
+  height: 60%;
+  object-fit: cover;
+}
+
+.item-card-image-placeholder {
+  width: 100%;
+  height: 60%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.item-card-label-large {
+  font-size: 2rem;
+  font-weight: bold;
+  color: white;
+  text-align: center;
+  padding: 20px;
+}
+
+.item-card-info {
+  padding: 20px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.item-card-label {
+  margin: 0 0 12px 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.item-card-attributes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.item-card-attribute {
+  display: flex;
+  gap: 8px;
+  font-size: 0.95rem;
+}
+
+.attribute-key {
+  font-weight: 600;
+  color: #666;
+  text-transform: capitalize;
+}
+
+.attribute-value {
+  color: #333;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .item-card {
+    width: 95%;
+    height: 550px;
+  }
+  
+  .item-card-label {
+    font-size: 1.3rem;
+  }
+  
+  .item-card-label-large {
+    font-size: 1.8rem;
+  }
+}

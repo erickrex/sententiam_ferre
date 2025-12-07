@@ -1,0 +1,91 @@
+/* Mobile-first join request form styles */
+.join-request-form {
+  width: 100%;
+  max-width: 500px;
+}
+
+.join-request-form .form-group {
+  margin-bottom: 1rem;
+}
+
+.join-request-form .form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: #1a1a1a;
+}
+
+.join-request-form .form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+  font-family: inherit;
+}
+
+.join-request-form .form-group input:focus {
+  outline: none;
+  border-color: #646cff;
+}
+
+.join-request-form .form-group input.error {
+  border-color: #ff4444;
+}
+
+.join-request-form .error-message {
+  display: block;
+  color: #ff4444;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+.join-request-form .submit-button {
+  width: 100%;
+  padding: 0.875rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-height: 44px;
+  background-color: #646cff;
+  color: white;
+}
+
+.join-request-form .submit-button:hover:not(:disabled) {
+  background-color: #535bf2;
+}
+
+.join-request-form .submit-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .join-request-form .form-group label {
+    color: rgba(255, 255, 255, 0.87);
+  }
+  
+  .join-request-form .form-group input {
+    background-color: #1a1a1a;
+    border-color: #444;
+    color: rgba(255, 255, 255, 0.87);
+  }
+  
+  .join-request-form .form-group input:focus {
+    border-color: #646cff;
+  }
+}
+
+/* Tablet and desktop */
+@media (min-width: 768px) {
+  .join-request-form {
+    max-width: 600px;
+  }
+}

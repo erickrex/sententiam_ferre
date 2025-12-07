@@ -1,0 +1,173 @@
+.decision-detail {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.decision-header {
+  margin-bottom: 2rem;
+}
+
+.decision-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.decision-title {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #333;
+  flex: 1;
+}
+
+.decision-description {
+  margin: 0;
+  color: #666;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.decision-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.detail-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.detail-label {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.detail-value {
+  margin: 0;
+  font-size: 1rem;
+  color: #333;
+  font-weight: 500;
+}
+
+.status-controls {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.controls-label {
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.status-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.status-button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 140px;
+}
+
+.status-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.status-button.open {
+  background-color: #28a745;
+  color: white;
+}
+
+.status-button.open:hover {
+  background-color: #218838;
+}
+
+.status-button.closed {
+  background-color: #17a2b8;
+  color: white;
+}
+
+.status-button.closed:hover {
+  background-color: #138496;
+}
+
+.status-button.archived {
+  background-color: #6f42c1;
+  color: white;
+}
+
+.status-button.archived:hover {
+  background-color: #5a32a3;
+}
+
+.status-note {
+  margin: 0;
+  padding: 0.75rem;
+  background-color: #fff3cd;
+  border-left: 4px solid #ffc107;
+  color: #856404;
+  font-size: 0.9rem;
+  border-radius: 4px;
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .decision-detail {
+    padding: 1rem;
+  }
+
+  .decision-info {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .decision-title {
+    font-size: 1.5rem;
+  }
+
+  .decision-details-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .status-buttons {
+    flex-direction: column;
+  }
+
+  .status-button {
+    width: 100%;
+  }
+}

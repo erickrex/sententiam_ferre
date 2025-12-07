@@ -1,0 +1,144 @@
+.item-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.item-list-empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #666;
+}
+
+.item-list-card {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.2s;
+}
+
+.item-list-card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.item-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.item-list-label {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+  flex: 1;
+}
+
+.item-list-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.item-action-button {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.item-action-button:hover {
+  background-color: #f5f5f5;
+}
+
+.item-action-button.delete:hover {
+  background-color: #ffebee;
+}
+
+.item-list-attributes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.item-list-attribute {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.attribute-key {
+  font-weight: 600;
+  color: #555;
+  text-transform: capitalize;
+}
+
+.attribute-value {
+  color: #333;
+}
+
+.item-list-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.item-tag {
+  background-color: #e3f2fd;
+  color: #1976d2;
+  padding: 0.25rem 0.75rem;
+  border-radius: 16px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.item-list-ref {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #f0f0f0;
+}
+
+.ref-label {
+  font-weight: 600;
+}
+
+.ref-value {
+  font-family: monospace;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .item-list {
+    padding: 0.5rem;
+  }
+
+  .item-list-card {
+    padding: 0.75rem;
+  }
+
+  .item-list-label {
+    font-size: 1.1rem;
+  }
+
+  .item-action-button {
+    font-size: 1.1rem;
+  }
+}

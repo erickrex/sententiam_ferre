@@ -1,0 +1,79 @@
+/* Mobile-first login page styles */
+.login-page {
+  min-height: calc(100vh - 60px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 450px;
+  margin: 0 auto;
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.auth-header h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.2;
+}
+
+.auth-header p {
+  color: #666;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.auth-footer p {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.auth-link {
+  color: #646cff;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.auth-link:hover {
+  text-decoration: underline;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .auth-header p {
+    color: #aaa;
+  }
+  
+  .auth-footer {
+    border-top-color: #444;
+  }
+}
+
+/* Tablet and desktop */
+@media (min-width: 768px) {
+  .login-page {
+    padding: 2rem;
+  }
+  
+  .auth-header h1 {
+    font-size: 2.5rem;
+  }
+  
+  .auth-header p {
+    font-size: 1rem;
+  }
+}

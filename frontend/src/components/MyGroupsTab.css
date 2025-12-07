@@ -1,0 +1,39 @@
+.my-groups-tab {
+  padding: 1rem 0;
+}
+
+.my-groups-tab .tab-header {
+  margin-bottom: 2rem;
+}
+
+.my-groups-tab .section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary, #1a1a1a);
+  margin: 0 0 0.5rem 0;
+}
+
+.my-groups-tab .section-description {
+  font-size: 0.95rem;
+  color: var(--text-secondary, #666);
+  margin: 0;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .my-groups-tab {
+    padding: 0.5rem 0;
+  }
+
+  .my-groups-tab .tab-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .my-groups-tab .section-title {
+    font-size: 1.25rem;
+  }
+
+  .my-groups-tab .section-description {
+    font-size: 0.9rem;
+  }
+}

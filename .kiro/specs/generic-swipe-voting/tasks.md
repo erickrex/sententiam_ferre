@@ -1,0 +1,433 @@
+# Implementation Plan
+
+- [x] 1. Set up project structure and database
+  - [x] 1.1 Initialize Django project with DRF using UV
+    - Install UV if not already installed (https://docs.astral.sh/uv/)
+    - Create pyproject.toml with Django 5.2 LTS as dependency
+    - Use `uv add django djangorestframework psycopg2-binary django-cors-headers argon2-cffi` to add dependencies
+    - Create Django project "sententiam_ferre" using `uv run django-admin startproject`
+    - Configure settings for PostgreSQL connection
+    - Set up environment variables for secrets
+    - _Requirements: 1.1, 1.2_
+    - **IMPORTANT: Always use UV to run Python commands (e.g., `uv run python`, `uv run django-admin`)**
+    - **IMPORTANT: Always add dependencies to pyproject.toml using `uv add <package>`**
+  - [x] 1.2 Apply database schema from DDL
+    - Execute provided PostgreSQL DDL script
+    - Verify all tables, indexes, and triggers are created
+    - Create Django models matching the database schema
+    - Generate initial Django migrations
+    - _Requirements: 2.1, 3.1, 4.1, 5.1, 6.1_
+  - [x] 1.3 Configure authentication and security
+    - Install and configure Argon2 password hasher
+    - Set up DRF token authentication
+    - Configure CORS for frontend communication
+    - _Requirements: 1.1, 12.1_
+
+- [-] 2. Implement authentication module
+  - [x] 2.1 Create UserAccount model and serializers
+    - Define UserAccount model with all fields from DDL
+    - Create serializers for registration and login
+    - Implement password validation for complexity requirements
+    - _Requirements: 1.1, 1.4_
+  - [ ]* 2.2 Write property test for password hashing
+    - **Property 1: Password hashing preservation**
+    - **Validates: Requirements 1.1, 12.1**
+  - [x] 2.3 Create authentication endpoints
+    - Implement signup endpoint (POST /api/v1/auth/signup)
+    - Implement login endpoint (POST /api/v1/auth/login)
+    - Implement logout endpoint (POST /api/v1/auth/logout)
+    - Implement current user endpoint (GET /api/v1/auth/me)
+    - _Requirements: 1.1, 1.2_
+  - [ ]* 2.4 Write property tests for authentication
+    - **Property 2: Authentication token validity**
+    - **Property 3: Invalid credential rejection**
+    - **Property 4: Password complexity enforcement**
+    - **Validates: Requirements 1.2, 1.3, 1.4**
+
+- [x] 3. Implement group management module
+  - [x] 3.1 Create AppGroup and GroupMembership models
+    - Define AppGroup model with fields from DDL
+    - Define GroupMembership model with role and confirmation status
+    - Create serializers for groups and memberships
+    - _Requirements: 2.1, 2.2_
+  - [x] 3.2 Implement group CRUD endpoints
+    - Create group endpoint (POST /api/v1/groups)
+    - Get group details endpoint (GET /api/v1/groups/:id)
+    - List user's groups endpoint (GET /api/v1/groups)
+    - _Requirements: 2.1_
+  - [x] 3.3 Write property test for group creator auto-membership
+    - **Property 5: Group creator auto-membership**
+    - **Validates: Requirements 2.1**
+  - [x] 3.4 Implement invitation system
+    - Invite user endpoint (POST /api/v1/groups/:id/members)
+    - Accept/decline invitation endpoint (PATCH /api/v1/groups/:id/members/:userId)
+    - Remove member endpoint (DELETE /api/v1/groups/:id/members/:userId)
+    - List group members endpoint (GET /api/v1/groups/:id/members)
+    - _Requirements: 2.2, 2.4, 2.5_
+  - [x] 3.5 Write property tests for invitation flow
+    - **Property 6: Invitation creates pending membership**
+    - **Property 7: Invitation acceptance updates status**
+    - **Property 8: Invitation decline removes membership**
+    - **Validates: Requirements 2.2, 2.4, 2.5**
+
+- [x] 4. Implement decision module
+  - [x] 4.1 Create Decision model and serializers
+    - Define Decision model with status enum and rules JSONField
+    - Create serializers with rule validation
+    - Implement status state machine validation
+    - _Requirements: 3.1, 3.2, 3.3, 3.5_
+  - [x] 4.2 Write property tests for decision creation
+    - **Property 9: Decision field persistence**
+    - **Property 10: Threshold rule validation**
+    - **Property 11: Decision initial status**
+    - **Property 12: Decision status transitions**
+    - **Validates: Requirements 3.1, 3.3, 3.4, 3.5**
+  - [x] 4.3 Implement decision CRUD endpoints
+    - Create decision endpoint (POST /api/v1/decisions)
+    - Get decision details endpoint (GET /api/v1/decisions/:id)
+    - Update decision endpoint (PATCH /api/v1/decisions/:id)
+    - List group decisions endpoint (GET /api/v1/groups/:id/decisions)
+    - _Requirements: 3.1, 3.5_
+  - [x] 4.4 Implement decision sharing
+    - Create DecisionSharedGroup model
+    - Share decision endpoint (POST /api/v1/decisions/:id/share-group)
+    - Update authorization to check shared groups
+    - _Requirements: 15.1, 15.3_
+  - [x] 4.5 Write property tests for decision sharing
+    - **Property 47: Decision sharing creates link**
+    - **Property 49: Shared group access permissions**
+    - **Validates: Requirements 15.1, 15.3**
+
+- [x] 5. Implement taxonomy and tagging system
+  - [x] 5.1 Create Taxonomy and Term models
+    - Define Taxonomy model with unique key constraint
+    - Define Term model with attributes JSONB field
+    - Create serializers for taxonomies and terms
+    - _Requirements: 11.1, 11.2, 11.3_
+  - [x] 5.2 Write property tests for taxonomy management
+    - **Property 38: Taxonomy name uniqueness**
+    - **Property 39: Term taxonomy linking**
+    - **Property 40: Term metadata storage**
+    - **Property 41: Taxonomy reusability**
+    - **Validates: Requirements 11.1, 11.2, 11.3, 11.4**
+  - [x] 5.3 Implement taxonomy endpoints
+    - List taxonomies endpoint (GET /api/v1/taxonomies)
+    - Create taxonomy endpoint (POST /api/v1/taxonomies)
+    - Add term endpoint (POST /api/v1/taxonomies/:id/terms)
+    - List terms endpoint (GET /api/v1/taxonomies/:id/terms)
+    - _Requirements: 11.1, 11.2_
+
+- [x] 6. Implement item management module
+  - [x] 6.1 Create DecisionItem and CatalogItem models
+    - Define DecisionItem model with attributes JSONB and GIN index
+    - Define CatalogItem model for reusable items
+    - Create DecisionItemTerm and CatalogItemTerm link tables
+    - Create serializers with nested attribute handling
+    - _Requirements: 4.1, 4.2, 4.3_
+  - [x] 6.2 Write property tests for item management
+    - **Property 13: Item attribute storage**
+    - **Property 14: Catalog item linking**
+    - **Property 15: Item tagging creates link**
+    - **Property 16: Duplicate item prevention**
+    - **Validates: Requirements 4.1, 4.2, 4.3, 4.4**
+  - [x] 6.3 Implement item CRUD endpoints
+    - Add item endpoint (POST /api/v1/decisions/:id/items)
+    - List items endpoint (GET /api/v1/decisions/:id/items)
+    - Update item endpoint (PATCH /api/v1/items/:id)
+    - Delete item endpoint (DELETE /api/v1/items/:id)
+    - _Requirements: 4.1_
+  - [x] 6.4 Implement item tagging endpoints
+    - Tag item endpoint (POST /api/v1/items/:id/terms/:termId)
+    - Untag item endpoint (DELETE /api/v1/items/:id/terms/:termId)
+    - _Requirements: 4.3_
+  - [x] 6.5 Implement item filtering and search
+    - Add tag filter support to list items endpoint
+    - Add JSONB attribute query support
+    - Implement combined filter logic
+    - Add pagination with configurable page size
+    - _Requirements: 7.1, 7.2, 7.3, 7.4_
+  - [x] 6.6 Write property tests for filtering
+    - **Property 23: Tag filtering accuracy**
+    - **Property 24: Attribute filtering accuracy**
+    - **Property 25: Combined filter intersection**
+    - **Property 26: Pagination correctness**
+    - **Validates: Requirements 7.1, 7.2, 7.3, 7.4**
+
+- [x] 7. Implement voting module
+  - [x] 7.1 Create DecisionVote model
+    - Define DecisionVote model with unique constraint on (user_id, item_id)
+    - Add check constraint for is_like or rating requirement
+    - Create serializers with validation
+    - _Requirements: 5.1, 5.2, 5.4_
+  - [x] 7.2 Write property tests for voting
+    - **Property 17: Vote storage and updates**
+    - **Property 18: Vote field requirement**
+    - **Validates: Requirements 5.1, 5.2, 5.4**
+  - [x] 7.3 Implement voting endpoints
+    - Cast vote endpoint (POST /api/v1/items/:id/votes)
+    - Get user's vote endpoint (GET /api/v1/items/:id/votes/me)
+    - Get vote summary endpoint (GET /api/v1/items/:id/votes/summary)
+    - _Requirements: 5.1_
+  - [x] 7.4 Verify database trigger functionality
+    - Test that trg_maybe_select_item executes on vote insert/update
+    - Verify trigger creates decision_selection for unanimous rules
+    - Verify trigger creates decision_selection for threshold rules
+    - _Requirements: 6.1, 6.2, 6.3_
+  - [x] 7.5 Write property tests for approval rules
+    - **Property 19: Unanimous rule evaluation**
+    - **Property 20: Threshold rule evaluation**
+    - **Property 21: Selection snapshot preservation**
+    - **Property 22: Selection idempotency**
+    - **Validates: Requirements 6.2, 6.3, 6.4, 6.6**
+
+- [x] 8. Implement favourites module
+  - [x] 8.1 Create DecisionSelection model
+    - Define DecisionSelection model (read-only from app perspective)
+    - Create serializer with snapshot data
+    - _Requirements: 6.4_
+  - [x] 8.2 Implement favourites endpoints
+    - List favourites endpoint (GET /api/v1/decisions/:id/favourites)
+    - Include item details and snapshot in response
+    - _Requirements: 6.1_
+  - [x] 8.3 Implement decision closure logic
+    - Add permission check to prevent voting on closed decisions
+    - Verify favourites are preserved on closure
+    - _Requirements: 10.2, 10.3_
+  - [x] 8.4 Write property tests for closure behavior
+    - **Property 35: Decision closure prevents voting**
+    - **Property 36: Closure preserves favourites**
+    - **Property 46: Rule change non-retroactivity**
+    - **Validates: Requirements 10.2, 10.3, 14.3**
+  - [x] 8.5 Write property test for dynamic threshold recalculation
+    - **Property 45: Member removal threshold recalculation**
+    - **Validates: Requirements 14.2**
+
+- [x] 9. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 10. Implement chat module
+  - [x] 10.1 Create Conversation and Message models
+    - Define Conversation model linked to decision
+    - Define Message model with sender, text, timestamp, is_read
+    - Add index on (conversation_id, sent_at)
+    - Create serializers for messages
+    - _Requirements: 8.1, 8.2_
+  - [x] 10.2 Write property tests for chat
+    - **Property 27: Conversation idempotent creation**
+    - **Property 28: Message field persistence**
+    - **Property 29: Message chronological ordering**
+    - **Property 30: Message read flag updates**
+    - **Property 31: Chat access control**
+    - **Validates: Requirements 8.1, 8.2, 8.3, 8.4, 8.5**
+  - [x] 10.3 Implement chat endpoints
+    - Get conversation endpoint (GET /api/v1/decisions/:id/conversation)
+    - Send message endpoint (POST /api/v1/decisions/:id/messages)
+    - List messages endpoint (GET /api/v1/decisions/:id/messages)
+    - Mark message read endpoint (PATCH /api/v1/messages/:id)
+    - _Requirements: 8.1, 8.2, 8.4_
+  - [x] 10.4 Implement chat authorization
+    - Verify user is confirmed group member for all chat operations
+    - Allow read access to closed decision chats
+    - _Requirements: 8.5, 10.4_
+  - [x] 10.5 Write property test for closed chat readability
+    - **Property 37: Closed chat readability**
+    - **Validates: Requirements 10.4**
+
+- [x] 11. Implement questionnaire module
+  - [x] 11.1 Create Question, AnswerOption, and UserAnswer models
+    - Define Question model with scope field
+    - Define AnswerOption model for predefined choices
+    - Define UserAnswer model with unique constraint
+    - Create serializers for questions and answers
+    - _Requirements: 9.3, 9.4_
+  - [x] 11.2 Write property tests for questionnaires
+    - **Property 32: Scoped question filtering**
+    - **Property 33: Answer persistence**
+    - **Property 34: Answer uniqueness enforcement**
+    - **Validates: Requirements 9.2, 9.3, 9.4**
+  - [x] 11.3 Implement questionnaire endpoints
+    - List questions endpoint (GET /api/v1/questions)
+    - Submit answer endpoint (POST /api/v1/answers)
+    - Add scope filtering (global, item_type, decision, group)
+    - _Requirements: 9.2, 9.3_
+
+- [x] 12. Implement authorization and security
+  - [x] 12.1 Create permission classes
+    - IsGroupMember permission for group resources
+    - IsDecisionParticipant permission for decision resources
+    - IsGroupAdmin permission for admin operations
+    - _Requirements: 12.2, 12.5_
+  - [x] 12.2 Write property tests for authorization
+    - **Property 42: Decision access authorization**
+    - **Property 43: Vote privacy preservation**
+    - **Property 44: Role-based operation control**
+    - **Property 48: Shared decision threshold scope**
+    - **Validates: Requirements 12.2, 12.3, 12.5, 15.2**
+  - [x] 12.3 Apply permissions to all endpoints
+    - Add permission_classes to all ViewSets
+    - Verify authentication required for all endpoints except signup/login
+    - Test authorization with different user roles
+    - _Requirements: 12.2, 12.4, 12.5_
+  - [x] 12.4 Implement rate limiting
+    - Add rate limiting to login endpoint (5 attempts per 15 minutes)
+    - Add general rate limiting to API endpoints
+    - _Requirements: 1.3_
+
+- [x] 13. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 14. Initialize React frontend project
+  - [x] 14.1 Create React app structure
+    - Initialize React 18 project with Create React App or Vite
+    - Set up folder structure (components, pages, services, utils)
+    - Install dependencies (axios, react-router-dom, react-swipeable) using npm or yarn
+    - Configure environment variables for API endpoint
+    - _Requirements: 13.1_
+    - **Use React 18 latest stable version**
+  - [x] 14.2 Set up routing and navigation
+    - Configure React Router with routes for all pages
+    - Create navigation component with mobile-first design
+    - Implement protected routes for authenticated pages
+    - _Requirements: 13.1_
+  - [x] 14.3 Create API service layer
+    - Create axios instance with base URL and auth interceptors
+    - Implement API methods for all backend endpoints
+    - Add error handling and token refresh logic
+    - _Requirements: 13.1_
+
+- [x] 15. Implement authentication UI
+  - [x] 15.1 Create authentication components
+    - Build SignupForm component with validation
+    - Build LoginForm component
+    - Create AuthContext for global auth state
+    - Implement token storage in localStorage
+    - _Requirements: 1.1, 1.2_
+  - [x] 15.2 Create authentication pages
+    - Build signup page with mobile-responsive layout
+    - Build login page with mobile-responsive layout
+    - Add password visibility toggle
+    - Add form validation feedback
+    - _Requirements: 1.1, 1.2, 13.2_
+
+- [x] 16. Implement group management UI
+  - [x] 16.1 Create group components
+    - Build GroupList component to display user's groups
+    - Build GroupDetail component with member list
+    - Build CreateGroupForm component
+    - Build InviteModal component for inviting users
+    - _Requirements: 2.1, 2.2_
+  - [x] 16.2 Create group pages
+    - Build groups list page with mobile-responsive cards
+    - Build group detail page with tabs for decisions and members
+    - Add invitation acceptance/decline UI
+    - _Requirements: 2.1, 2.2, 2.4, 2.5, 13.2_
+
+- [x] 17. Implement decision management UI
+  - [x] 17.1 Create decision components
+    - Build DecisionList component for group's decisions
+    - Build DecisionDetail component with status and rules display
+    - Build CreateDecisionForm with rule selector
+    - Build RuleSelector for unanimous vs threshold configuration
+    - _Requirements: 3.1, 3.2, 3.3_
+  - [x] 17.2 Create decision pages
+    - Build decisions list page with filtering by status
+    - Build decision detail page with tabs for items, favourites, chat
+    - Add decision status update controls for admins
+    - _Requirements: 3.1, 3.5, 13.2_
+
+- [x] 18. Implement swipe voting UI
+  - [x] 18.1 Create swipe components
+    - Build SwipeCardStack component with card animations
+    - Build ItemCard component with image, label, attributes display
+    - Implement swipe gesture detection (left/right)
+    - Add visual feedback (tilt, overlay colors)
+    - _Requirements: 5.1, 13.2, 13.3, 13.4_
+  - [x] 18.2 Create voting page
+    - Build main voting page with card stack
+    - Add alternative vote buttons for non-swipe interaction
+    - Add rating input option
+    - Show vote count and progress indicator
+    - _Requirements: 5.1, 13.2, 13.3, 13.4_
+  - [x] 18.3 Implement vote submission
+    - Connect swipe gestures to vote API calls
+    - Handle vote success/error states
+    - Update UI to show next item after vote
+    - Add undo last vote functionality
+    - _Requirements: 5.1, 13.3, 13.4_
+
+- [x] 19. Implement favourites UI
+  - [x] 19.1 Create favourites components
+    - Build FavouritesList component
+    - Build FavouriteCard component with vote snapshot display
+    - Add real-time updates when new favourites are created
+    - _Requirements: 6.1_
+  - [x] 19.2 Create favourites page
+    - Build favourites list page with mobile-responsive layout
+    - Add filtering and sorting options
+    - Show vote tallies and approval percentage
+    - _Requirements: 6.1, 13.2_
+
+- [x] 20. Implement chat UI
+  - [x] 20.1 Create chat components
+    - Build ChatView component with message list and input
+    - Build MessageList component with scrolling
+    - Build MessageInput component with send button
+    - Build MessageBubble component with sender info
+    - _Requirements: 8.1, 8.2_
+  - [x] 20.2 Create chat interface
+    - Build chat page or tab within decision detail
+    - Implement auto-scroll to latest message
+    - Add message read status indicators
+    - Add typing indicator (optional)
+    - _Requirements: 8.1, 8.2, 8.4, 13.2_
+
+- [x] 21. Implement item management UI
+  - [x] 21.1 Create item management components
+    - Build ItemList component for admin view
+    - Build AddItemForm component with attribute inputs
+    - Build ItemFilter component with tag and attribute filters
+    - Build TagSelector component for multi-select
+    - _Requirements: 4.1, 4.3, 7.1_
+  - [x] 21.2 Create item management page
+    - Build item management page for organizers
+    - Add bulk import functionality (optional)
+    - Add item editing and deletion
+    - _Requirements: 4.1, 13.2_
+
+- [x] 22. Implement mobile-first responsive design
+  - [x] 22.1 Apply responsive CSS
+    - Create mobile-first CSS with breakpoints
+    - Ensure touch targets are minimum 44x44px
+    - Optimize layouts for portrait mobile screens
+    - Test on various mobile devices and screen sizes
+    - _Requirements: 13.2, 13.5_
+  - [x] 22.2 Add mobile optimizations
+    - Implement lazy loading for images
+    - Add pull-to-refresh on lists
+    - Optimize bundle size and loading performance
+    - Add service worker for PWA capabilities (optional)
+    - _Requirements: 13.2, 13.5_
+
+- [x] 23. Final integration and testing
+  - [x] 23.1 End-to-end testing
+    - Test complete user flow: signup → create group → invite → create decision → add items → vote → see favourites
+    - Test chat functionality across multiple users
+    - Test filtering and search with various combinations
+    - Test authorization boundaries (non-members cannot access)
+    - _Requirements: All_
+  - [x] 23.2 Performance optimization
+    - Profile API response times
+    - Verify database indexes are being used
+    - Optimize N+1 queries with select_related/prefetch_related
+    - Add API response caching where appropriate
+    - _Requirements: 7.4_
+  - [x] 23.3 Security audit
+    - Verify all endpoints require authentication
+    - Test authorization with different user roles
+    - Verify password hashing is working correctly
+    - Test CORS configuration
+    - Check for SQL injection vulnerabilities
+    - _Requirements: 12.1, 12.2, 12.5_
+
+- [x] 24. Final Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.

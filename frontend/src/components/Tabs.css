@@ -1,0 +1,96 @@
+/* Mobile-first tabs component styles */
+.tabs-container {
+  width: 100%;
+}
+
+.tabs-header {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 2px solid #e5e7eb;
+  margin-bottom: 1.5rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.tabs-header::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.tab-button {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  min-height: 44px;
+  min-width: 44px;
+  flex-shrink: 0;
+}
+
+.tab-button:hover {
+  color: #374151;
+  background-color: rgba(100, 108, 255, 0.05);
+}
+
+.tab-button.active {
+  color: #646cff;
+  border-bottom-color: #646cff;
+}
+
+.tabs-content {
+  width: 100%;
+}
+
+.tab-content {
+  animation: fadeIn 0.2s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .tabs-header {
+    border-bottom-color: #374151;
+  }
+
+  .tab-button {
+    color: #9ca3af;
+  }
+
+  .tab-button:hover {
+    color: #d1d5db;
+    background-color: rgba(100, 108, 255, 0.1);
+  }
+
+  .tab-button.active {
+    color: #818cf8;
+    border-bottom-color: #818cf8;
+  }
+}
+
+/* Tablet and desktop */
+@media (min-width: 768px) {
+  .tabs-header {
+    overflow-x: visible;
+  }
+
+  .tab-button {
+    padding: 1rem 2rem;
+  }
+}

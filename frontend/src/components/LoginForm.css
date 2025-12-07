@@ -1,0 +1,131 @@
+/* Mobile-first login form styles */
+.login-form {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #646cff;
+}
+
+.form-group input.error {
+  border-color: #ff4444;
+}
+
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-wrapper input {
+  padding-right: 3rem;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 0.5rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.toggle-password:hover {
+  border-color: transparent;
+  opacity: 0.7;
+}
+
+.error-message {
+  display: block;
+  color: #ff4444;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+.form-error {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.submit-button {
+  width: 100%;
+  padding: 0.875rem;
+  font-size: 1rem;
+  font-weight: 600;
+  background-color: #646cff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  min-height: 44px;
+}
+
+.submit-button:hover:not(:disabled) {
+  background-color: #535bf2;
+  border-color: transparent;
+}
+
+.submit-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .form-group input {
+    background-color: #1a1a1a;
+    border-color: #444;
+    color: rgba(255, 255, 255, 0.87);
+  }
+  
+  .form-group input:focus {
+    border-color: #646cff;
+  }
+  
+  .form-error {
+    background-color: #3d1f1f;
+    color: #ff6b6b;
+  }
+}
+
+/* Tablet and desktop */
+@media (min-width: 768px) {
+  .login-form {
+    max-width: 450px;
+  }
+}

@@ -1,0 +1,46 @@
+/* Mobile-first app styles with responsive breakpoints */
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.main-content {
+  flex: 1;
+  padding: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  /* Ensure content doesn't overflow on small screens */
+  overflow-x: hidden;
+}
+
+/* Small mobile (portrait phones, less than 576px) */
+@media (max-width: 575px) {
+  .main-content {
+    padding: 0.75rem;
+  }
+}
+
+/* Tablet (768px and up) */
+@media (min-width: 768px) {
+  .main-content {
+    padding: 1.5rem;
+  }
+}
+
+/* Desktop (1024px and up) */
+@media (min-width: 1024px) {
+  .main-content {
+    padding: 2rem;
+  }
+}
+
+/* Large desktop (1440px and up) */
+@media (min-width: 1440px) {
+  .main-content {
+    max-width: 1400px;
+  }
+}

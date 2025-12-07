@@ -1,0 +1,150 @@
+.rejected-requests-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.rejected-requests-list.empty {
+  padding: 2rem;
+  text-align: center;
+}
+
+.rejected-requests-list .empty-message {
+  color: #666;
+  font-style: italic;
+}
+
+.rejected-requests-list .request-card {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1rem;
+  transition: box-shadow 0.2s;
+}
+
+.rejected-requests-list .request-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.rejected-requests-list .request-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.rejected-requests-list .username {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.rejected-requests-list .request-info {
+  margin-bottom: 1rem;
+}
+
+.rejected-requests-list .request-date {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.rejected-requests-list .request-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.rejected-requests-list .delete-button {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-height: 44px;
+  background-color: #f44336;
+  color: white;
+}
+
+.rejected-requests-list .delete-button:hover:not(:disabled) {
+  background-color: #da190b;
+}
+
+.rejected-requests-list .delete-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.rejected-requests-list .delete-confirm {
+  width: 100%;
+}
+
+.rejected-requests-list .confirm-message {
+  margin: 0 0 0.75rem 0;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.rejected-requests-list .confirm-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.rejected-requests-list .cancel-button,
+.rejected-requests-list .confirm-delete-button {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-height: 44px;
+}
+
+.rejected-requests-list .cancel-button {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+.rejected-requests-list .cancel-button:hover:not(:disabled) {
+  background-color: #d0d0d0;
+}
+
+.rejected-requests-list .confirm-delete-button {
+  background-color: #f44336;
+  color: white;
+}
+
+.rejected-requests-list .confirm-delete-button:hover:not(:disabled) {
+  background-color: #da190b;
+}
+
+.rejected-requests-list .cancel-button:disabled,
+.rejected-requests-list .confirm-delete-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .rejected-requests-list .request-actions {
+    flex-direction: column;
+  }
+  
+  .rejected-requests-list .delete-button {
+    width: 100%;
+  }
+  
+  .rejected-requests-list .confirm-buttons {
+    flex-direction: column;
+  }
+  
+  .rejected-requests-list .cancel-button,
+  .rejected-requests-list .confirm-delete-button {
+    width: 100%;
+  }
+}

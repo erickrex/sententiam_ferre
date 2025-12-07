@@ -1,0 +1,30 @@
+{
+  "name": "Sententiam Ferre",
+  "short_name": "SentFerre",
+  "description": "Mobile-first collaborative decision-making platform with swipe-style voting",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#646cff",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/vite.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "social"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "My Groups",
+      "short_name": "Groups",
+      "description": "View your groups",
+      "url": "/groups",
+      "icons": []
+    }
+  ],
+  "prefer_related_applications": false
+}

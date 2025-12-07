@@ -1,0 +1,102 @@
+.invite-user-form {
+  background: var(--card-background, #fff);
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.invite-user-form.empty {
+  text-align: center;
+  padding: 2rem 1.5rem;
+}
+
+.invite-user-form .empty-message {
+  font-size: 1rem;
+  color: var(--text-primary, #1a1a1a);
+  margin: 0 0 0.5rem 0;
+}
+
+.invite-user-form .empty-hint {
+  font-size: 0.9rem;
+  color: var(--text-secondary, #666);
+  margin: 0;
+}
+
+.invite-user-form .loading-text {
+  text-align: center;
+  color: var(--text-secondary, #666);
+  margin: 0;
+}
+
+.invite-user-form form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.invite-user-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.invite-user-form label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-primary, #1a1a1a);
+}
+
+.invite-user-form .form-select,
+.invite-user-form .form-input {
+  padding: 0.75rem;
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 6px;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.invite-user-form .form-select:focus,
+.invite-user-form .form-input:focus {
+  outline: none;
+  border-color: var(--primary-color, #007bff);
+}
+
+.invite-user-form .form-select:disabled,
+.invite-user-form .form-input:disabled {
+  background-color: var(--disabled-background, #f5f5f5);
+  cursor: not-allowed;
+}
+
+.invite-user-form .submit-button {
+  padding: 0.75rem 1.5rem;
+  background-color: var(--primary-color, #007bff);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.invite-user-form .submit-button:hover:not(:disabled) {
+  background-color: var(--primary-hover, #0056b3);
+}
+
+.invite-user-form .submit-button:disabled {
+  background-color: var(--disabled-background, #ccc);
+  cursor: not-allowed;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .invite-user-form {
+    padding: 1rem;
+  }
+
+  .invite-user-form .submit-button {
+    width: 100%;
+  }
+}
