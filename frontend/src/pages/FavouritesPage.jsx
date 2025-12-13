@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { decisionsAPI } from '../services/api';
 import FavouritesList from '../components/FavouritesList';
@@ -11,22 +11,24 @@ function FavouritesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    loadDecision();
-  }, [decisionId, loadDecision]);
-
-  const loadDecision = async () => {
+  const loadDecision = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
       const response = await decisionsAPI.get(decisionId);
-      setDecision(response.data);
+      // API returns { status: 'success', data: {...} }
+      const decisionData = response.data.data || response.data;
+      setDecision(decisionData);
     } catch (err) {
       setError(err.message || 'Failed to load decision');
     } finally {
       setLoading(false);
     }
-  };
+  }, [decisionId]);
+
+  useEffect(() => {
+    loadDecision();
+  }, [loadDecision]);
 
   if (loading) {
     return (

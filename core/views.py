@@ -2487,7 +2487,58 @@ class VoteViewSet(viewsets.GenericViewSet):
                 'status': 'error',
                 'message': 'Item not found'
             }, status=status.HTTP_404_NOT_FOUND)
-
+    
+    @action(detail=False, methods=['delete'], url_path='items/(?P<item_id>[^/.]+)/votes')
+    def delete_vote(self, request, item_id=None):
+        """
+        Delete current user's vote on an item (for undo functionality)
+        DELETE /api/v1/votes/items/:id/votes
+        """
+        try:
+            item = DecisionItem.objects.get(pk=item_id)
+            
+            # Check if user is a confirmed member of the decision's group
+            membership = GroupMembership.objects.filter(
+                group=item.decision.group,
+                user=request.user,
+                is_confirmed=True
+            ).first()
+            
+            if not membership:
+                return Response({
+                    'status': 'error',
+                    'message': 'You do not have permission to access this item'
+                }, status=status.HTTP_403_FORBIDDEN)
+            
+            # Check if decision is closed
+            if item.decision.status == 'closed':
+                return Response({
+                    'status': 'error',
+                    'message': 'Cannot modify votes on items in a closed decision'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Delete the vote
+            deleted_count, _ = DecisionVote.objects.filter(
+                item=item,
+                user=request.user
+            ).delete()
+            
+            if deleted_count > 0:
+                return Response({
+                    'status': 'success',
+                    'message': 'Vote deleted successfully'
+                }, status=status.HTTP_200_OK)
+            else:
+                return Response({
+                    'status': 'error',
+                    'message': 'No vote found to delete'
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+        except DecisionItem.DoesNotExist:
+            return Response({
+                'status': 'error',
+                'message': 'Item not found'
+            }, status=status.HTTP_404_NOT_FOUND)
 
 
 class MessageViewSet(viewsets.GenericViewSet):

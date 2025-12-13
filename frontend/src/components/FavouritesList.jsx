@@ -36,8 +36,12 @@ function FavouritesList({ decisionId, autoRefresh = false, refreshInterval = 500
       }
       
       const response = await decisionsAPI.listFavourites(decisionId);
-      const data = response.data.results || response.data || [];
-      setFavourites(data);
+      // API returns { status: 'success', data: [...] } or { status: 'success', data: { results: [...] } }
+      let data = response.data.data || response.data;
+      if (data && data.results) {
+        data = data.results;
+      }
+      setFavourites(Array.isArray(data) ? data : []);
     } catch (err) {
       if (!silent) {
         setError(err.message || 'Failed to load favourites');

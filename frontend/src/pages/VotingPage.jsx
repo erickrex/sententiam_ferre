@@ -27,20 +27,35 @@ function VotingPage() {
         
         // Fetch decision details
         const decisionResponse = await decisionsAPI.get(decisionId);
-        setDecision(decisionResponse.data.data);
+        const decisionData = decisionResponse.data.data || decisionResponse.data;
+        setDecision(decisionData);
         
         // Fetch items for this decision
         const itemsResponse = await itemsAPI.list(decisionId);
-        const fetchedItems = itemsResponse.data.data.results || itemsResponse.data.data;
+        console.log('Items response:', itemsResponse);
+        let fetchedItems = itemsResponse.data.data?.results || itemsResponse.data.data || itemsResponse.data.results || itemsResponse.data || [];
+        
+        // Ensure it's an array
+        if (!Array.isArray(fetchedItems)) {
+          console.warn('fetchedItems is not an array:', fetchedItems);
+          fetchedItems = [];
+        }
+        
+        console.log('Fetched items:', fetchedItems);
         
         // Filter out items the user has already voted on
         const itemsWithVotes = await Promise.all(
           fetchedItems.map(async (item) => {
             try {
               const voteResponse = await votingAPI.getMyVote(item.id);
-              return { ...item, hasVoted: true, myVote: voteResponse.data.data };
+              // API returns { status: 'success', data: null } when no vote exists
+              const voteData = voteResponse.data.data;
+              if (voteData) {
+                return { ...item, hasVoted: true, myVote: voteData };
+              }
+              return { ...item, hasVoted: false };
             } catch (err) {
-              // 404 means no vote yet
+              // Error means no vote or access denied
               return { ...item, hasVoted: false };
             }
           })
@@ -48,6 +63,7 @@ function VotingPage() {
         
         // Only show items without votes
         const unvotedItems = itemsWithVotes.filter(item => !item.hasVoted);
+        console.log('Unvoted items:', unvotedItems);
         setItems(unvotedItems);
         
         setLoading(false);
@@ -114,15 +130,24 @@ function VotingPage() {
   };
 
   // Handle undo last vote
-  const handleUndo = () => {
+  const handleUndo = async () => {
     if (voteHistory.length === 0) return;
     
     const lastVote = voteHistory[voteHistory.length - 1];
     
-    // Go back to the previous item
-    // Note: The vote remains in the database but user can change it
-    setCurrentIndex(lastVote.index);
-    setVoteHistory(voteHistory.slice(0, -1));
+    try {
+      // Delete the vote from the database
+      await votingAPI.deleteVote(lastVote.itemId);
+      
+      // Go back to the previous item
+      setCurrentIndex(lastVote.index);
+      setVoteHistory(voteHistory.slice(0, -1));
+      
+      setToast({ message: 'Vote undone', type: 'success' });
+    } catch (err) {
+      console.error('Error undoing vote:', err);
+      setToast({ message: err.message || 'Failed to undo vote', type: 'error' });
+    }
   };
 
   // Calculate progress
@@ -248,8 +273,8 @@ function VotingPage() {
         </div>
       )}
 
-      {/* Undo button */}
-      {voteHistory.length > 0 && currentIndex < items.length && (
+      {/* Undo button - show if there's history, even after all items voted */}
+      {voteHistory.length > 0 && (
         <button 
           className="undo-button"
           onClick={handleUndo}

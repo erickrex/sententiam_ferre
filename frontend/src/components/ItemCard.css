@@ -7,13 +7,7 @@
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   overflow: hidden;
-  cursor: grab;
   user-select: none;
-  touch-action: none;
-}
-
-.item-card:active {
-  cursor: grabbing;
 }
 
 .item-card-content {
@@ -49,7 +43,7 @@
 .item-card-info {
   padding: 20px;
   flex: 1;
-  overflow-y: auto;
+  overflow-y: hidden;
 }
 
 .item-card-label {

@@ -12,12 +12,15 @@ function Tabs({ children, defaultTab }) {
         {tabs.map((tab, index) => (
           <button
             key={index}
-            className={`tab-button ${activeTab === index ? 'active' : ''}`}
+            className={`tab-button ${activeTab === index ? 'active' : ''} ${tab.props.badge ? 'has-badge' : ''}`}
             onClick={() => setActiveTab(index)}
             aria-selected={activeTab === index}
             role="tab"
           >
             {tab.props.label}
+            {tab.props.badge > 0 && (
+              <span className="tab-badge">{tab.props.badge > 9 ? '9+' : tab.props.badge}</span>
+            )}
           </button>
         ))}
       </div>
@@ -40,6 +43,7 @@ function Tab({ children }) {
 Tab.propTypes = {
   label: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired,
+  badge: PropTypes.number,
 };
 
 export { Tabs, Tab };

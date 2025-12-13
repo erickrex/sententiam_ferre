@@ -70,7 +70,7 @@ function CreateDecisionForm({ groupId, onSubmit, onCancel }) {
     try {
       const decisionData = {
         ...formData,
-        group_id: groupId
+        group: groupId
       };
       await onSubmit(decisionData);
     } catch (err) {

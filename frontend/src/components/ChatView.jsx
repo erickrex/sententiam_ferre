@@ -18,12 +18,13 @@ function ChatView({ decisionId, isClosed = false }) {
       
       // Get or create conversation
       const conversationResponse = await chatAPI.getConversation(decisionId);
-      setConversationId(conversationResponse.data.id);
+      const conversationData = conversationResponse.data.data || conversationResponse.data;
+      setConversationId(conversationData?.id);
       
       // Load messages
       const messagesResponse = await chatAPI.listMessages(decisionId);
-      const messagesList = messagesResponse.data.results || messagesResponse.data || [];
-      setMessages(messagesList);
+      const messagesList = messagesResponse.data.data?.results || messagesResponse.data.results || messagesResponse.data || [];
+      setMessages(Array.isArray(messagesList) ? messagesList : []);
     } catch (err) {
       setError(err.message || 'Failed to load messages');
       console.error('Error loading messages:', err);
@@ -48,7 +49,7 @@ function ChatView({ decisionId, isClosed = false }) {
       const response = await chatAPI.sendMessage(decisionId, { text });
       
       // Add the new message to the list
-      const newMessage = response.data;
+      const newMessage = response.data.data || response.data;
       setMessages(prev => [...prev, newMessage]);
       
       return response;

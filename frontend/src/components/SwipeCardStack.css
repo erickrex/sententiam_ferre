@@ -13,6 +13,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
 }
 
 .card-background {
@@ -23,6 +26,23 @@
 
 .card-foreground {
   z-index: 2;
+  cursor: grab;
+  user-select: none;
+  /* Ensure the entire wrapper area is interactive */
+  background: transparent;
+}
+
+.card-foreground:active {
+  cursor: grabbing;
+}
+
+/* Ensure the card itself is draggable */
+.card-foreground .item-card {
+  cursor: grab;
+}
+
+.card-foreground:active .item-card {
+  cursor: grabbing;
 }
 
 .swipe-overlay {

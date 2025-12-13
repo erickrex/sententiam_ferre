@@ -72,7 +72,9 @@ function DecisionDetail({ decision, isAdmin, onStatusChange }) {
         <div className="detail-section">
           <h3 className="detail-label">Created</h3>
           <p className="detail-value">
-            {new Date(decision.created_at).toLocaleDateString()}
+            {decision.created_at 
+              ? new Date(decision.created_at).toLocaleDateString()
+              : 'N/A'}
           </p>
         </div>
 
@@ -80,7 +82,9 @@ function DecisionDetail({ decision, isAdmin, onStatusChange }) {
           <div className="detail-section">
             <h3 className="detail-label">Last Updated</h3>
             <p className="detail-value">
-              {new Date(decision.updated_at).toLocaleDateString()}
+              {decision.updated_at 
+                ? new Date(decision.updated_at).toLocaleDateString()
+                : 'N/A'}
             </p>
           </div>
         )}

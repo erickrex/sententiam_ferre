@@ -128,8 +128,8 @@ export const decisionsAPI = {
 
 // Items API
 export const itemsAPI = {
-  list: (decisionId, params) => api.get(`/decisions/${decisionId}/items/`, { params }),
-  create: (decisionId, itemData) => api.post(`/decisions/${decisionId}/items/`, itemData),
+  list: (decisionId, params = {}) => api.get('/items/', { params: { decision_id: decisionId, ...params } }),
+  create: (decisionId, itemData) => api.post('/items/', { ...itemData, decision: decisionId }),
   update: (itemId, data) => api.patch(`/items/${itemId}/`, data),
   delete: (itemId) => api.delete(`/items/${itemId}/`),
   tagItem: (itemId, termId) => api.post(`/items/${itemId}/terms/${termId}/`),
@@ -138,9 +138,10 @@ export const itemsAPI = {
 
 // Voting API
 export const votingAPI = {
-  castVote: (itemId, voteData) => api.post(`/items/${itemId}/votes/`, voteData),
-  getMyVote: (itemId) => api.get(`/items/${itemId}/votes/me/`),
-  getVoteSummary: (itemId) => api.get(`/items/${itemId}/votes/summary/`),
+  castVote: (itemId, voteData) => api.post(`/votes/items/${itemId}/votes/`, voteData),
+  getMyVote: (itemId) => api.get(`/votes/items/${itemId}/votes/me/`),
+  getVoteSummary: (itemId) => api.get(`/votes/items/${itemId}/votes/summary/`),
+  deleteVote: (itemId) => api.delete(`/votes/items/${itemId}/votes/`),
 };
 
 // Chat API

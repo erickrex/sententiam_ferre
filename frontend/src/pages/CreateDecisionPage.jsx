@@ -12,7 +12,8 @@ function CreateDecisionPage() {
     try {
       const response = await decisionsAPI.create(decisionData);
       // Navigate to the newly created decision
-      navigate(`/decisions/${response.data.id}`);
+      const decisionId = response.data.data?.id || response.data.id;
+      navigate(`/decisions/${decisionId}`);
     } catch (err) {
       throw new Error(err.message || 'Failed to create decision');
     }

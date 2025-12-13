@@ -1,10 +1,85 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { decisionsAPI, itemsAPI } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import DecisionDetail from '../components/DecisionDetail';
 import ChatView from '../components/ChatView';
 import './DecisionDetailPage.css';
+
+// Simple Items Tab component with pagination
+function ItemsTab({ items, isAdmin, decisionId }) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
+  
+  const totalPages = Math.ceil(items.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentItems = items.slice(startIndex, endIndex);
+  
+  return (
+    <div className="items-tab">
+      <div className="tab-header">
+        <h2>Items ({items.length})</h2>
+        {isAdmin ? (
+          <Link 
+            to={`/decisions/${decisionId}/items`}
+            className="manage-items-button"
+          >
+            Manage Items
+          </Link>
+        ) : (
+          <button 
+            className="manage-items-button"
+            disabled
+            title="Only admins can manage items"
+          >
+            Manage Items
+          </button>
+        )}
+      </div>
+      
+      {items.length === 0 ? (
+        <div className="empty-state">
+          <p>No items yet.</p>
+          {isAdmin && <p>Add items for members to vote on!</p>}
+        </div>
+      ) : (
+        <>
+          <ul className="items-simple-list">
+            {currentItems.map((item, index) => (
+              <li key={item.id} className="item-row">
+                <span className="item-number">{startIndex + index + 1}.</span>
+                <span className="item-name">{item.label}</span>
+              </li>
+            ))}
+          </ul>
+          
+          {totalPages > 1 && (
+            <div className="pagination">
+              <button 
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="pagination-btn"
+              >
+                ← Previous
+              </button>
+              <span className="pagination-info">
+                Page {currentPage} of {totalPages}
+              </span>
+              <button 
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="pagination-btn"
+              >
+                Next →
+              </button>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
 
 function DecisionDetailPage() {
   const { decisionId } = useParams();
@@ -19,17 +94,15 @@ function DecisionDetailPage() {
   const [error, setError] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
 
-  useEffect(() => {
-    loadDecisionData();
-  }, [decisionId, loadDecisionData]);
-
-  const loadDecisionData = async () => {
+  const loadDecisionData = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
       
       const decisionResponse = await decisionsAPI.get(decisionId);
-      setDecision(decisionResponse.data);
+      // API returns { status: 'success', data: {...} }
+      const decisionData = decisionResponse.data.data || decisionResponse.data;
+      setDecision(decisionData);
       
       // Check if user is admin (creator or group admin)
       // This is a simplified check - in production, you'd verify group membership
@@ -41,14 +114,26 @@ function DecisionDetailPage() {
         decisionsAPI.listFavourites(decisionId)
       ]);
       
-      setItems(itemsResponse.data.results || itemsResponse.data || []);
-      setFavourites(favouritesResponse.data.results || favouritesResponse.data || []);
+      // API returns { status: 'success', data: { results: [...], count: 20, ... } }
+      const itemsData = itemsResponse.data.data?.results || itemsResponse.data.data || itemsResponse.data.results || itemsResponse.data || [];
+      setItems(Array.isArray(itemsData) ? itemsData : []);
+      
+      // API returns { status: 'success', data: [...] }
+      let favouritesData = favouritesResponse.data.data || favouritesResponse.data;
+      if (favouritesData && favouritesData.results) {
+        favouritesData = favouritesData.results;
+      }
+      setFavourites(Array.isArray(favouritesData) ? favouritesData : []);
     } catch (err) {
       setError(err.message || 'Failed to load decision data');
     } finally {
       setLoading(false);
     }
-  };
+  }, [decisionId]);
+
+  useEffect(() => {
+    loadDecisionData();
+  }, [loadDecisionData]);
 
   const handleStatusChange = async (newStatus) => {
     try {
@@ -131,43 +216,11 @@ function DecisionDetailPage() {
         )}
 
         {activeTab === 'items' && (
-          <div className="items-tab">
-            <div className="tab-header">
-              <h2>Items</h2>
-              {isAdmin && (
-                <Link 
-                  to={`/decisions/${decisionId}/items`}
-                  className="manage-items-button"
-                >
-                  Manage Items
-                </Link>
-              )}
-            </div>
-            
-            {items.length === 0 ? (
-              <div className="empty-state">
-                <p>No items yet.</p>
-                {isAdmin && <p>Add items for members to vote on!</p>}
-              </div>
-            ) : (
-              <div className="items-list">
-                {items.map((item) => (
-                  <div key={item.id} className="item-card">
-                    <h3 className="item-label">{item.label}</h3>
-                    {item.attributes && Object.keys(item.attributes).length > 0 && (
-                      <div className="item-attributes">
-                        {Object.entries(item.attributes).map(([key, value]) => (
-                          <span key={key} className="attribute">
-                            <strong>{key}:</strong> {String(value)}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          <ItemsTab 
+            items={items} 
+            isAdmin={isAdmin} 
+            decisionId={decisionId} 
+          />
         )}
 
         {activeTab === 'favourites' && (

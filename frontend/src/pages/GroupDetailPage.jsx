@@ -76,13 +76,13 @@ function GroupDetailPage() {
       
       // Check for pending invitations for current user
       const membersList = Array.isArray(membersData) ? membersData : [];
-      const userMembership = membersList.find(m => m.user_id === user?.id);
+      const userMembership = membersList.find(m => m.user?.id === user?.id);
       if (userMembership && !userMembership.is_confirmed) {
         setPendingInvitations([userMembership]);
       }
       
       // Load admin-specific data if user is admin
-      const isUserAdmin = membersList.find(m => m.user_id === user?.id)?.role === 'admin';
+      const isUserAdmin = membersList.find(m => m.user?.id === user?.id)?.role === 'admin';
       if (isUserAdmin) {
         await loadAdminData();
       }
@@ -145,6 +145,15 @@ function GroupDetailPage() {
       await loadGroupData();
     } catch (err) {
       setError(err.message || 'Failed to accept invitation');
+    }
+  };
+
+  const handleUpdateMembership = async (userId, updates) => {
+    try {
+      await groupsAPI.updateMembership(groupId, userId, updates);
+      await loadGroupData();
+    } catch (err) {
+      setError(err.message || 'Failed to update membership');
     }
   };
 
@@ -234,7 +243,7 @@ function GroupDetailPage() {
     );
   }
 
-  const isAdmin = members.find(m => m.user_id === user?.id)?.role === 'admin';
+  const isAdmin = members.find(m => m.user?.id === user?.id)?.role === 'admin';
 
   return (
     <div className="group-detail-page">
@@ -334,42 +343,9 @@ function GroupDetailPage() {
               members={members}
               onInvite={() => setShowInviteModal(true)}
               onRemoveMember={handleRemoveMember}
+              onUpdateMembership={handleUpdateMembership}
               isAdmin={isAdmin}
             />
-            
-            {isAdmin && (
-              <div className="admin-section">
-                <div 
-                  className="admin-section-header"
-                  onClick={() => !adminDataLoading && toggleSection('joinRequests')}
-                >
-                  <h2 className="section-title">
-                    Join Requests {!adminDataLoading && `(${joinRequests.length})`}
-                  </h2>
-                  {!adminDataLoading && (
-                    <button 
-                      className={`collapse-toggle ${collapsedSections.joinRequests ? 'collapsed' : ''}`}
-                      aria-label={collapsedSections.joinRequests ? 'Expand section' : 'Collapse section'}
-                    >
-                      ▼
-                    </button>
-                  )}
-                </div>
-                <div className={`admin-section-content ${collapsedSections.joinRequests ? 'collapsed' : 'expanded'}`}>
-                  {adminDataLoading ? (
-                    <SkeletonLoader type="card" count={2} />
-                  ) : (
-                    <JoinRequestsList
-                      requests={joinRequests}
-                      onApprove={handleApproveRequest}
-                      onReject={handleRejectRequest}
-                      onSuccess={showSuccess}
-                      onError={showError}
-                    />
-                  )}
-                </div>
-              </div>
-            )}
             
             {isAdmin && rejectedInvitations.length > 0 && (
               <div className="admin-section">

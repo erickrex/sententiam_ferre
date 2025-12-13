@@ -1,15 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import './GroupDetail.css';
 
 function GroupDetail({ group, members, onInvite, onRemoveMember, onUpdateMembership, isAdmin }) {
-  const [showInviteModal, setShowInviteModal] = useState(false);
-
   if (!group) {
     return <div className="loading">Loading group details...</div>;
   }
 
   const confirmedMembers = members?.filter(m => m.is_confirmed) || [];
-  const pendingMembers = members?.filter(m => !m.is_confirmed) || [];
+  const pendingInvitations = members?.filter(m => !m.is_confirmed && m.membership_type === 'invitation') || [];
+  const pendingJoinRequests = members?.filter(m => !m.is_confirmed && m.membership_type === 'request') || [];
 
   return (
     <div className="group-detail">
@@ -23,7 +22,7 @@ function GroupDetail({ group, members, onInvite, onRemoveMember, onUpdateMembers
         {isAdmin && (
           <button 
             className="invite-button"
-            onClick={() => setShowInviteModal(true)}
+            onClick={onInvite}
           >
             + Invite Member
           </button>
@@ -58,11 +57,11 @@ function GroupDetail({ group, members, onInvite, onRemoveMember, onUpdateMembers
         </div>
       </div>
 
-      {pendingMembers.length > 0 && (
+      {pendingInvitations.length > 0 && (
         <div className="pending-section">
-          <h2 className="section-title">Pending Invitations ({pendingMembers.length})</h2>
+          <h2 className="section-title">Pending Invitations ({pendingInvitations.length})</h2>
           <div className="member-list">
-            {pendingMembers.map((member) => (
+            {pendingInvitations.map((member) => (
               <div key={member.id} className="member-item pending">
                 <div className="member-info">
                   <span className="member-name">{member.user?.username || 'Unknown'}</span>
@@ -75,6 +74,38 @@ function GroupDetail({ group, members, onInvite, onRemoveMember, onUpdateMembers
                   >
                     Cancel
                   </button>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {pendingJoinRequests.length > 0 && (
+        <div className="pending-section">
+          <h2 className="section-title">Pending Join Requests ({pendingJoinRequests.length})</h2>
+          <div className="member-list">
+            {pendingJoinRequests.map((member) => (
+              <div key={member.id} className="member-item pending">
+                <div className="member-info">
+                  <span className="member-name">{member.user?.username || 'Unknown'}</span>
+                  <span className="status-badge pending">Pending</span>
+                </div>
+                {isAdmin && (
+                  <div className="member-actions">
+                    <button
+                      className="accept-button"
+                      onClick={() => onUpdateMembership(member.user?.id, { is_confirmed: true })}
+                    >
+                      Accept
+                    </button>
+                    <button
+                      className="remove-button"
+                      onClick={() => onRemoveMember(member.user?.id)}
+                    >
+                      Reject
+                    </button>
+                  </div>
                 )}
               </div>
             ))}
