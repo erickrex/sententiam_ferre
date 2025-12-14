@@ -1,0 +1,353 @@
+.character-card {
+  position: relative;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.character-card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+}
+
+.character-card.status-pending,
+.character-card.status-processing {
+  border-color: #ffc107;
+}
+
+.character-card.status-failed {
+  border-color: #dc3545;
+}
+
+.character-card.status-completed {
+  border-color: #28a745;
+}
+
+/* Status indicator */
+.character-status {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  z-index: 10;
+  backdrop-filter: blur(4px);
+}
+
+.character-status.pending {
+  background: rgba(255, 193, 7, 0.9);
+  color: #856404;
+}
+
+.character-status.completed {
+  background: rgba(40, 167, 69, 0.9);
+  color: white;
+}
+
+.character-status.failed {
+  background: rgba(220, 53, 69, 0.9);
+  color: white;
+}
+
+.status-spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(133, 100, 4, 0.3);
+  border-top-color: #856404;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.status-icon {
+  font-size: 0.875rem;
+}
+
+/* Version badge */
+.version-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(102, 126, 234, 0.9);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  z-index: 10;
+  backdrop-filter: blur(4px);
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.version-badge.clickable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.version-badge.clickable:hover {
+  background: rgba(102, 126, 234, 1);
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+}
+
+.version-badge .variation-count {
+  background: rgba(255, 255, 255, 0.3);
+  padding: 1px 5px;
+  border-radius: 8px;
+  font-size: 0.65rem;
+}
+
+/* Image container */
+.character-card-image-container {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+}
+
+.character-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.character-card:hover .character-card-image {
+  transform: scale(1.05);
+}
+
+/* Image placeholders */
+.character-card-image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.character-card-image-placeholder.generating {
+  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+}
+
+.character-card-image-placeholder.error {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+}
+
+.placeholder-icon {
+  font-size: 3rem;
+}
+
+/* Generating animation */
+.generating-animation {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pulse-ring {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border: 3px solid rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+  animation: pulse-ring 1.5s ease-out infinite;
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.8);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+.generating-icon {
+  font-size: 2.5rem;
+  animation: bounce 1s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.generating-text {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #856404;
+}
+
+/* Error state */
+.error-icon {
+  font-size: 2.5rem;
+}
+
+.error-text {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.error-message {
+  font-size: 0.75rem;
+  opacity: 0.9;
+  text-align: center;
+  padding: 0 16px;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Content section */
+.character-card-content {
+  padding: 16px;
+}
+
+.character-card-title {
+  margin: 0 0 12px 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Parameters */
+.character-card-params {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.param-tag {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: #f8f9fa;
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+.param-label {
+  color: #666;
+  font-weight: 500;
+}
+
+.param-value {
+  color: #333;
+  font-weight: 600;
+}
+
+/* Actions */
+.character-card-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.action-btn {
+  flex: 1;
+  min-width: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.action-btn .btn-icon {
+  font-size: 0.9rem;
+}
+
+.action-btn.primary {
+  background: #007bff;
+  color: white;
+}
+
+.action-btn.primary:hover {
+  background: #0056b3;
+}
+
+.action-btn.secondary {
+  background: #f8f9fa;
+  color: #333;
+  border: 1px solid #dee2e6;
+}
+
+.action-btn.secondary:hover {
+  background: #e9ecef;
+}
+
+.action-btn.retry {
+  background: #ffc107;
+  color: #856404;
+}
+
+.action-btn.retry:hover {
+  background: #e0a800;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .character-card-image-container {
+    height: 180px;
+  }
+
+  .character-card-content {
+    padding: 12px;
+  }
+
+  .character-card-title {
+    font-size: 0.95rem;
+  }
+
+  .action-btn {
+    padding: 6px 10px;
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .character-card-image-container {
+    height: 160px;
+  }
+
+  .character-card-actions {
+    flex-direction: column;
+  }
+
+  .action-btn {
+    min-width: auto;
+  }
+}

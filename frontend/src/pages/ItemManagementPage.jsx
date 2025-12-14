@@ -4,7 +4,9 @@ import ItemList from '../components/ItemList';
 import AddItemForm from '../components/AddItemForm';
 import ItemFilter from '../components/ItemFilter';
 import Toast from '../components/Toast';
-import { itemsAPI, taxonomiesAPI, decisionsAPI } from '../services/api';
+import CharacterCreationForm from '../components/CharacterCreationForm';
+import CharacterGallery from '../components/CharacterGallery';
+import { itemsAPI, taxonomiesAPI, decisionsAPI, generationAPI } from '../services/api';
 import './ItemManagementPage.css';
 
 function ItemManagementPage() {
@@ -20,6 +22,12 @@ function ItemManagementPage() {
   const [filters, setFilters] = useState({ tags: [], attributes: {} });
   const [toast, setToast] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  // Check if this is a 2D character decision
+  const isCharacterDecision = decision?.item_type === '2d_character';
+  const lockedParams = decision?.rules?.locked_params || {};
 
   useEffect(() => {
     loadData();
@@ -113,6 +121,40 @@ function ItemManagementPage() {
     }
   };
 
+  // Handle character generation (for 2D character decisions)
+  const handleCreateCharacter = async (characterData) => {
+    try {
+      setIsGenerating(true);
+      await generationAPI.createGeneration(decisionId, characterData);
+      showToast('Character generation started! It will appear in the gallery shortly.', 'success');
+      setShowAddForm(false);
+      setRefreshTrigger(prev => prev + 1);
+    } catch (err) {
+      console.error('Failed to create character:', err);
+      showToast(err.message || 'Failed to create character', 'error');
+      throw err;
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  // Handle creating a variation of an existing character
+  const handleCreateVariation = async (item) => {
+    // Pre-fill the form with the parent's parameters
+    setEditingItem({
+      ...item,
+      isVariation: true,
+      parentItemId: item.id,
+    });
+    setShowAddForm(true);
+  };
+
+  // Handle viewing character details
+  const handleViewDetails = (item) => {
+    // Could navigate to a detail page or show a modal
+    console.log('View details for:', item);
+  };
+
   const handleEditItem = async (itemData) => {
     try {
       await itemsAPI.update(editingItem.id, itemData);
@@ -186,12 +228,28 @@ function ItemManagementPage() {
             className="add-item-button"
             onClick={() => setShowAddForm(true)}
           >
-            + Add Item
+            {isCharacterDecision ? '+ Create Character' : '+ Add Item'}
           </button>
         )}
       </div>
 
-      {(showAddForm || editingItem) && (
+      {/* Character Creation Form (for 2D character decisions) */}
+      {isCharacterDecision && (showAddForm || editingItem) && (
+        <div className="form-container">
+          <CharacterCreationForm
+            lockedParams={lockedParams}
+            onSubmit={handleCreateCharacter}
+            onCancel={() => {
+              setShowAddForm(false);
+              setEditingItem(null);
+            }}
+            isSubmitting={isGenerating}
+          />
+        </div>
+      )}
+
+      {/* Regular Item Form (for non-character decisions) */}
+      {!isCharacterDecision && (showAddForm || editingItem) && (
         <div className="form-container">
           <AddItemForm
             onSubmit={editingItem ? handleEditItem : handleAddItem}
@@ -205,7 +263,20 @@ function ItemManagementPage() {
         </div>
       )}
 
-      {!showAddForm && !editingItem && (
+      {/* Character Gallery (for 2D character decisions) */}
+      {isCharacterDecision && !showAddForm && !editingItem && (
+        <div className="items-container">
+          <CharacterGallery
+            decisionId={decisionId}
+            onCreateVariation={handleCreateVariation}
+            onViewDetails={handleViewDetails}
+            refreshTrigger={refreshTrigger}
+          />
+        </div>
+      )}
+
+      {/* Regular Item List (for non-character decisions) */}
+      {!isCharacterDecision && !showAddForm && !editingItem && (
         <>
           <ItemFilter
             taxonomies={taxonomies}

@@ -141,8 +141,28 @@ class Decision(models.Model):
         """Check if transition to new_status is valid"""
         return new_status in self.VALID_TRANSITIONS.get(self.status, [])
     
+    # Valid parameter names that can be locked for 2D character generation
+    LOCKABLE_PARAMS = [
+        'art_style',
+        'view_angle', 
+        'color_palette',
+        'pose',
+        'expression',
+        'background',
+    ]
+    
+    # Valid values for each lockable parameter
+    VALID_PARAM_VALUES = {
+        'art_style': ['cartoon', 'pixel_art', 'flat_vector', 'hand_drawn'],
+        'view_angle': ['side_profile', 'front_facing', 'three_quarter'],
+        'color_palette': ['vibrant', 'pastel', 'muted', 'monochrome'],
+        'pose': ['idle', 'action', 'jumping', 'attacking', 'celebrating'],
+        'expression': ['neutral', 'happy', 'angry', 'surprised', 'determined'],
+        'background': ['transparent', 'solid_color', 'simple_gradient'],
+    }
+    
     def validate_rules(self):
-        """Validate the rules JSON structure"""
+        """Validate the rules JSON structure including locked_params"""
         if not isinstance(self.rules, dict):
             raise ValueError("Rules must be a JSON object")
         
@@ -159,7 +179,43 @@ class Decision(models.Model):
             if not (0 <= value <= 1):
                 raise ValueError("Threshold value must be between 0 and 1")
         
+        # Validate locked_params if present
+        locked_params = self.rules.get('locked_params')
+        if locked_params is not None:
+            if not isinstance(locked_params, dict):
+                raise ValueError("locked_params must be a JSON object")
+            
+            for param_name, param_value in locked_params.items():
+                if param_name not in self.LOCKABLE_PARAMS:
+                    raise ValueError(
+                        f"Invalid locked parameter: '{param_name}'. "
+                        f"Valid parameters: {', '.join(self.LOCKABLE_PARAMS)}"
+                    )
+                
+                valid_values = self.VALID_PARAM_VALUES.get(param_name, [])
+                if param_value not in valid_values:
+                    raise ValueError(
+                        f"Invalid value '{param_value}' for locked parameter '{param_name}'. "
+                        f"Valid values: {', '.join(valid_values)}"
+                    )
+        
         return True
+    
+    def get_locked_params(self):
+        """Get the locked parameters for this decision"""
+        if not self.rules:
+            return {}
+        return self.rules.get('locked_params', {})
+    
+    def is_param_locked(self, param_name):
+        """Check if a specific parameter is locked"""
+        locked_params = self.get_locked_params()
+        return param_name in locked_params
+    
+    def get_locked_param_value(self, param_name):
+        """Get the locked value for a parameter, or None if not locked"""
+        locked_params = self.get_locked_params()
+        return locked_params.get(param_name)
 
 
 class DecisionSharedGroup(models.Model):
@@ -233,6 +289,132 @@ class DecisionItem(models.Model):
 
     def __str__(self):
         return self.label
+    
+    # Character versioning helper methods
+    
+    def get_parent_item_id(self):
+        """Get the parent item ID from attributes, if any."""
+        if not self.attributes:
+            return None
+        return self.attributes.get('parent_item_id')
+    
+    def get_parent_item(self):
+        """Get the parent DecisionItem, if any."""
+        parent_id = self.get_parent_item_id()
+        if not parent_id:
+            return None
+        try:
+            return DecisionItem.objects.get(id=parent_id)
+        except DecisionItem.DoesNotExist:
+            return None
+    
+    def get_version(self):
+        """Get the version number from attributes."""
+        if not self.attributes:
+            return 1
+        return self.attributes.get('version', 1)
+    
+    def set_parent_item(self, parent_item):
+        """
+        Set the parent item reference and calculate version number.
+        
+        Args:
+            parent_item: The parent DecisionItem instance.
+        """
+        if self.attributes is None:
+            self.attributes = {}
+        
+        self.attributes['parent_item_id'] = str(parent_item.id)
+        
+        # Calculate version: parent's version + 1
+        parent_version = parent_item.get_version()
+        self.attributes['version'] = parent_version + 1
+    
+    def get_child_items(self):
+        """
+        Get all direct child items (variations) of this item.
+        
+        Returns:
+            QuerySet of DecisionItem instances that have this item as parent.
+        """
+        # We need to filter by attributes JSON field
+        # This requires a database that supports JSON queries (PostgreSQL)
+        return DecisionItem.objects.filter(
+            decision=self.decision,
+            attributes__parent_item_id=str(self.id)
+        )
+    
+    def get_variation_count(self):
+        """Get the count of direct child variations."""
+        return self.get_child_items().count()
+    
+    def get_version_chain(self):
+        """
+        Get the complete version chain from root to this item.
+        
+        Returns:
+            List of DecisionItem instances from root ancestor to this item.
+        """
+        chain = [self]
+        current = self
+        
+        # Walk up the parent chain
+        while True:
+            parent = current.get_parent_item()
+            if parent is None:
+                break
+            chain.insert(0, parent)
+            current = parent
+        
+        return chain
+    
+    def get_root_item(self):
+        """
+        Get the root item in the version chain.
+        
+        Returns:
+            The root DecisionItem (the one with no parent).
+        """
+        chain = self.get_version_chain()
+        return chain[0] if chain else self
+    
+    def get_generation_params(self):
+        """Get the generation parameters from attributes."""
+        if not self.attributes:
+            return {}
+        return self.attributes.get('generation_params', {})
+    
+    def get_param_diff_from_parent(self):
+        """
+        Get the parameters that differ from the parent item.
+        
+        Returns:
+            Dict of parameter names to (parent_value, current_value) tuples.
+            Empty dict if no parent or no differences.
+        """
+        parent = self.get_parent_item()
+        if not parent:
+            return {}
+        
+        parent_params = parent.get_generation_params()
+        current_params = self.get_generation_params()
+        
+        diff = {}
+        all_keys = set(parent_params.keys()) | set(current_params.keys())
+        
+        for key in all_keys:
+            parent_val = parent_params.get(key)
+            current_val = current_params.get(key)
+            if parent_val != current_val:
+                diff[key] = (parent_val, current_val)
+        
+        return diff
+    
+    def is_character_item(self):
+        """Check if this item is a 2D character item."""
+        if not self.attributes:
+            return False
+        return self.attributes.get('type') == '2d_character'
 
 
 class DecisionVote(models.Model):
@@ -532,3 +714,40 @@ class UserAnswer(models.Model):
 
     def __str__(self):
         return f"{self.user.username} answer to {self.question.text[:30]}"
+
+
+class GenerationJob(models.Model):
+    """Tracks the status of BRIA API generation requests for character images"""
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('processing', 'Processing'),
+        ('completed', 'Completed'),
+        ('failed', 'Failed'),
+    ]
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    item = models.ForeignKey(
+        DecisionItem,
+        on_delete=models.CASCADE,
+        related_name='generation_jobs'
+    )
+    request_id = models.CharField(max_length=255, null=True, blank=True)  # BRIA request_id
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    parameters = models.JSONField()  # Generation parameters sent to BRIA
+    image_url = models.URLField(max_length=2048, null=True, blank=True)  # Final image URL
+    error_message = models.TextField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = 'generation_job'
+        indexes = [
+            models.Index(fields=['item']),
+            models.Index(fields=['status']),
+            models.Index(fields=['request_id']),
+            models.Index(fields=['created_at']),
+        ]
+
+    def __str__(self):
+        return f"GenerationJob {self.id} for {self.item.label} ({self.status})"

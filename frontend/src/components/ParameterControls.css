@@ -1,0 +1,140 @@
+.parameter-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.parameter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.parameter-group.locked {
+  opacity: 0.85;
+}
+
+.parameter-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.parameter-label {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.lock-indicator {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.parameter-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.5rem;
+}
+
+.parameter-option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0.75rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  min-height: 60px;
+}
+
+.parameter-option:hover:not(:disabled) {
+  border-color: #1976d2;
+  background-color: #f5f9ff;
+}
+
+.parameter-option.selected {
+  border-color: #1976d2;
+  background-color: #e3f2fd;
+}
+
+.parameter-option.selected .option-label {
+  color: #1976d2;
+  font-weight: 600;
+}
+
+.parameter-option.locked {
+  cursor: not-allowed;
+  background-color: #f5f5f5;
+}
+
+.parameter-option.locked.selected {
+  border-color: #9e9e9e;
+  background-color: #eeeeee;
+}
+
+.parameter-option.locked .option-label {
+  color: #666;
+}
+
+.parameter-option:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.option-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.option-description {
+  font-size: 0.75rem;
+  color: #666;
+  margin-top: 0.25rem;
+  line-height: 1.3;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .parameter-options {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .parameter-option {
+    padding: 0.6rem;
+    min-height: 50px;
+  }
+
+  .option-label {
+    font-size: 0.85rem;
+  }
+
+  .option-description {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .parameter-options {
+    grid-template-columns: 1fr;
+  }
+
+  .parameter-option {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: auto;
+    padding: 0.75rem;
+  }
+
+  .option-description {
+    margin-top: 0;
+  }
+}

@@ -1,0 +1,112 @@
+.export-panel {
+  padding: 1rem;
+  background: var(--surface-color, #f8f9fa);
+  border-radius: 8px;
+  border: 1px solid var(--border-color, #e0e0e0);
+}
+
+.export-panel-title {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary, #666);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.export-panel-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.export-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.export-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.export-btn .btn-icon {
+  font-size: 1rem;
+}
+
+.export-btn .btn-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Image download button */
+.export-btn.image-btn {
+  background: var(--primary-color, #4a90d9);
+  color: white;
+}
+
+.export-btn.image-btn:hover:not(:disabled) {
+  background: var(--primary-hover, #3a7bc8);
+  transform: translateY(-1px);
+}
+
+.export-btn.image-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* JSON export button */
+.export-btn.json-btn {
+  background: var(--secondary-color, #6c757d);
+  color: white;
+}
+
+.export-btn.json-btn:hover:not(:disabled) {
+  background: var(--secondary-hover, #5a6268);
+  transform: translateY(-1px);
+}
+
+.export-btn.json-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* Responsive layout */
+@media (min-width: 480px) {
+  .export-panel-buttons {
+    flex-direction: row;
+  }
+  
+  .export-btn {
+    flex: 1;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .export-panel {
+    background: var(--surface-color-dark, #2d2d2d);
+    border-color: var(--border-color-dark, #404040);
+  }
+  
+  .export-panel-title {
+    color: var(--text-secondary-dark, #aaa);
+  }
+}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { decisionsAPI } from '../services/api';
+import { decisionsAPI, exportAPI } from '../services/api';
 import FavouriteCard from './FavouriteCard';
+import ExportPanel from './ExportPanel';
 import './FavouritesList.css';
 
 function FavouritesList({ decisionId, autoRefresh = false, refreshInterval = 5000 }) {
@@ -9,6 +10,9 @@ function FavouritesList({ decisionId, autoRefresh = false, refreshInterval = 500
   const [error, setError] = useState('');
   const [sortBy, setSortBy] = useState('date'); // 'date', 'approval'
   const [filterMinApproval, setFilterMinApproval] = useState(0);
+  const [downloadingAll, setDownloadingAll] = useState(false);
+  const [exportError, setExportError] = useState('');
+  const [selectedItem, setSelectedItem] = useState(null);
 
   useEffect(() => {
     loadFavourites();
@@ -83,6 +87,49 @@ function FavouritesList({ decisionId, autoRefresh = false, refreshInterval = 500
     loadFavourites();
   };
 
+  // Helper to trigger file download from blob
+  const downloadBlob = (blob, filename) => {
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  };
+
+  // Handle batch export of all approved characters
+  const handleBatchExport = async () => {
+    if (downloadingAll) return;
+    
+    setDownloadingAll(true);
+    setExportError('');
+    
+    try {
+      const response = await exportAPI.batchExport(decisionId);
+      const filename = `characters_export_${new Date().toISOString().split('T')[0]}.zip`;
+      downloadBlob(response.data, filename);
+    } catch (err) {
+      setExportError(err.message || 'Failed to export characters');
+    } finally {
+      setDownloadingAll(false);
+    }
+  };
+
+  // Check if there are any character items (items with image_url)
+  const hasCharacterItems = favourites.some(fav => 
+    fav.item?.attributes?.image_url || fav.item?.attributes?.type === '2d_character'
+  );
+
+  const handleExportError = (message) => {
+    setExportError(message);
+  };
+
+  const handleItemClick = (favourite) => {
+    setSelectedItem(selectedItem?.id === favourite.item?.id ? null : favourite.item);
+  };
+
   if (loading) {
     return (
       <div className="favourites-list-loading">
@@ -107,6 +154,20 @@ function FavouritesList({ decisionId, autoRefresh = false, refreshInterval = 500
 
   return (
     <div className="favourites-list">
+      {exportError && (
+        <div className="export-error-banner">
+          <span className="error-icon">⚠️</span>
+          <span className="error-text">{exportError}</span>
+          <button 
+            className="dismiss-btn" 
+            onClick={() => setExportError('')}
+            aria-label="Dismiss error"
+          >
+            ×
+          </button>
+        </div>
+      )}
+      
       <div className="favourites-controls">
         <div className="control-group">
           <label htmlFor="sort-by">Sort by:</label>
@@ -137,6 +198,27 @@ function FavouritesList({ decisionId, autoRefresh = false, refreshInterval = 500
         <button onClick={handleRefresh} className="refresh-button" title="Refresh">
           ↻ Refresh
         </button>
+        
+        {hasCharacterItems && sortedFavourites.length > 0 && (
+          <button 
+            onClick={handleBatchExport} 
+            className="download-all-button"
+            disabled={downloadingAll}
+            title="Download all approved characters as ZIP"
+          >
+            {downloadingAll ? (
+              <>
+                <span className="btn-spinner"></span>
+                Exporting...
+              </>
+            ) : (
+              <>
+                <span className="btn-icon">📦</span>
+                Download All
+              </>
+            )}
+          </button>
+        )}
       </div>
 
       {sortedFavourites.length === 0 ? (
@@ -153,7 +235,23 @@ function FavouritesList({ decisionId, autoRefresh = false, refreshInterval = 500
       ) : (
         <div className="favourites-grid">
           {sortedFavourites.map((favourite) => (
-            <FavouriteCard key={favourite.id} favourite={favourite} />
+            <div 
+              key={favourite.id} 
+              className={`favourite-item-wrapper ${selectedItem?.id === favourite.item?.id ? 'selected' : ''}`}
+            >
+              <div 
+                onClick={() => handleItemClick(favourite)}
+                className="favourite-card-clickable"
+              >
+                <FavouriteCard favourite={favourite} />
+              </div>
+              {selectedItem?.id === favourite.item?.id && favourite.item?.attributes?.image_url && (
+                <ExportPanel 
+                  item={favourite.item} 
+                  onError={handleExportError}
+                />
+              )}
+            </div>
           ))}
         </div>
       )}

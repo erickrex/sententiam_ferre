@@ -228,20 +228,54 @@ class MembershipActionSerializer(serializers.Serializer):
 
 
 
+def validate_locked_params(locked_params):
+    """
+    Validate locked_params structure for Decision rules.
+    
+    Args:
+        locked_params: The locked_params dict to validate
+        
+    Raises:
+        serializers.ValidationError: If validation fails
+    """
+    if not isinstance(locked_params, dict):
+        raise serializers.ValidationError("locked_params must be a JSON object")
+    
+    for param_name, param_value in locked_params.items():
+        if param_name not in Decision.LOCKABLE_PARAMS:
+            raise serializers.ValidationError(
+                f"Invalid locked parameter: '{param_name}'. "
+                f"Valid parameters: {', '.join(Decision.LOCKABLE_PARAMS)}"
+            )
+        
+        valid_values = Decision.VALID_PARAM_VALUES.get(param_name, [])
+        if param_value not in valid_values:
+            raise serializers.ValidationError(
+                f"Invalid value '{param_value}' for locked parameter '{param_name}'. "
+                f"Valid values: {', '.join(valid_values)}"
+            )
+
+
 class DecisionSerializer(serializers.ModelSerializer):
     """Serializer for Decision model with rule validation"""
     group_name = serializers.CharField(source='group.name', read_only=True)
+    locked_params = serializers.SerializerMethodField()
     
     class Meta:
         model = Decision
         fields = [
             'id', 'group', 'group_name', 'title', 'description', 
-            'item_type', 'rules', 'status', 'created_at', 'updated_at'
+            'item_type', 'rules', 'status', 'created_at', 'updated_at',
+            'locked_params'
         ]
-        read_only_fields = ['id', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'created_at', 'updated_at', 'locked_params']
+    
+    def get_locked_params(self, obj):
+        """Return the locked parameters from rules"""
+        return obj.get_locked_params()
     
     def validate_rules(self, value):
-        """Validate rules JSON structure"""
+        """Validate rules JSON structure including locked_params"""
         if not isinstance(value, dict):
             raise serializers.ValidationError("Rules must be a JSON object")
         
@@ -265,6 +299,11 @@ class DecisionSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     "Threshold value must be between 0 and 1"
                 )
+        
+        # Validate locked_params if present
+        locked_params = value.get('locked_params')
+        if locked_params is not None:
+            validate_locked_params(locked_params)
         
         return value
     
@@ -292,7 +331,7 @@ class DecisionCreateSerializer(serializers.ModelSerializer):
         ]
     
     def validate_rules(self, value):
-        """Validate rules JSON structure"""
+        """Validate rules JSON structure including locked_params"""
         if not isinstance(value, dict):
             raise serializers.ValidationError("Rules must be a JSON object")
         
@@ -316,6 +355,11 @@ class DecisionCreateSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     "Threshold value must be between 0 and 1"
                 )
+        
+        # Validate locked_params if present
+        locked_params = value.get('locked_params')
+        if locked_params is not None:
+            validate_locked_params(locked_params)
         
         return value
 
@@ -328,7 +372,7 @@ class DecisionUpdateSerializer(serializers.ModelSerializer):
         fields = ['title', 'description', 'rules', 'status']
     
     def validate_rules(self, value):
-        """Validate rules JSON structure"""
+        """Validate rules JSON structure including locked_params"""
         if not isinstance(value, dict):
             raise serializers.ValidationError("Rules must be a JSON object")
         
@@ -352,6 +396,11 @@ class DecisionUpdateSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     "Threshold value must be between 0 and 1"
                 )
+        
+        # Validate locked_params if present
+        locked_params = value.get('locked_params')
+        if locked_params is not None:
+            validate_locked_params(locked_params)
         
         return value
     
@@ -754,3 +803,205 @@ class UserAnswerCreateSerializer(serializers.ModelSerializer):
             )
         
         return attrs
+
+
+# Import GenerationJob model for serializers
+from core.models import GenerationJob
+
+
+class GenerationRequestSerializer(serializers.Serializer):
+    """Serializer for character generation requests"""
+    
+    # Valid options for generation parameters
+    VALID_ART_STYLES = ['cartoon', 'pixel_art', 'flat_vector', 'hand_drawn']
+    VALID_VIEW_ANGLES = ['side_profile', 'front_facing', 'three_quarter']
+    VALID_POSES = ['idle', 'action', 'jumping', 'attacking', 'celebrating']
+    VALID_EXPRESSIONS = ['neutral', 'happy', 'angry', 'surprised', 'determined']
+    VALID_BACKGROUNDS = ['transparent', 'solid_color', 'simple_gradient']
+    VALID_COLOR_PALETTES = ['vibrant', 'pastel', 'muted', 'monochrome']
+    
+    description = serializers.CharField(
+        required=True,
+        min_length=1,
+        max_length=500,
+        help_text="Character description (e.g., 'friendly robot sidekick')"
+    )
+    art_style = serializers.ChoiceField(
+        choices=VALID_ART_STYLES,
+        required=True,
+        help_text="Art style for the character"
+    )
+    view_angle = serializers.ChoiceField(
+        choices=VALID_VIEW_ANGLES,
+        required=True,
+        help_text="View angle for the character"
+    )
+    pose = serializers.ChoiceField(
+        choices=VALID_POSES,
+        required=False,
+        default='idle',
+        help_text="Character pose"
+    )
+    expression = serializers.ChoiceField(
+        choices=VALID_EXPRESSIONS,
+        required=False,
+        default='neutral',
+        help_text="Facial expression"
+    )
+    background = serializers.ChoiceField(
+        choices=VALID_BACKGROUNDS,
+        required=False,
+        default='transparent',
+        help_text="Background type"
+    )
+    color_palette = serializers.ChoiceField(
+        choices=VALID_COLOR_PALETTES,
+        required=False,
+        default='vibrant',
+        help_text="Color palette"
+    )
+    
+    def validate_description(self, value):
+        """Validate description is not empty or whitespace"""
+        if not value or not value.strip():
+            raise serializers.ValidationError("Description cannot be empty")
+        return value.strip()
+
+
+class GenerationJobSerializer(serializers.ModelSerializer):
+    """Serializer for GenerationJob model"""
+    item_label = serializers.CharField(source='item.label', read_only=True)
+    item_id = serializers.UUIDField(source='item.id', read_only=True)
+    decision_id = serializers.UUIDField(source='item.decision.id', read_only=True)
+    decision_title = serializers.CharField(source='item.decision.title', read_only=True)
+    
+    class Meta:
+        model = GenerationJob
+        fields = [
+            'id', 'item_id', 'item_label', 'decision_id', 'decision_title',
+            'request_id', 'status', 'parameters', 'image_url', 
+            'error_message', 'created_at', 'updated_at', 'completed_at'
+        ]
+        read_only_fields = [
+            'id', 'request_id', 'status', 'image_url', 
+            'error_message', 'created_at', 'updated_at', 'completed_at'
+        ]
+
+
+class GenerationStatusSerializer(serializers.Serializer):
+    """Serializer for generation status response"""
+    pending = serializers.IntegerField()
+    processing = serializers.IntegerField()
+    completed = serializers.IntegerField()
+    failed = serializers.IntegerField()
+
+
+class VariationRequestSerializer(serializers.Serializer):
+    """
+    Serializer for character variation requests.
+    
+    All fields are optional - if not provided, values will be inherited
+    from the parent item.
+    """
+    
+    # Valid options for generation parameters (same as GenerationRequestSerializer)
+    VALID_ART_STYLES = ['cartoon', 'pixel_art', 'flat_vector', 'hand_drawn']
+    VALID_VIEW_ANGLES = ['side_profile', 'front_facing', 'three_quarter']
+    VALID_POSES = ['idle', 'action', 'jumping', 'attacking', 'celebrating']
+    VALID_EXPRESSIONS = ['neutral', 'happy', 'angry', 'surprised', 'determined']
+    VALID_BACKGROUNDS = ['transparent', 'solid_color', 'simple_gradient']
+    VALID_COLOR_PALETTES = ['vibrant', 'pastel', 'muted', 'monochrome']
+    
+    description = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        max_length=500,
+        help_text="Character description (optional - inherits from parent if not provided)"
+    )
+    art_style = serializers.ChoiceField(
+        choices=VALID_ART_STYLES,
+        required=False,
+        allow_null=True,
+        help_text="Art style for the character (optional)"
+    )
+    view_angle = serializers.ChoiceField(
+        choices=VALID_VIEW_ANGLES,
+        required=False,
+        allow_null=True,
+        help_text="View angle for the character (optional)"
+    )
+    pose = serializers.ChoiceField(
+        choices=VALID_POSES,
+        required=False,
+        allow_null=True,
+        help_text="Character pose (optional)"
+    )
+    expression = serializers.ChoiceField(
+        choices=VALID_EXPRESSIONS,
+        required=False,
+        allow_null=True,
+        help_text="Facial expression (optional)"
+    )
+    background = serializers.ChoiceField(
+        choices=VALID_BACKGROUNDS,
+        required=False,
+        allow_null=True,
+        help_text="Background type (optional)"
+    )
+    color_palette = serializers.ChoiceField(
+        choices=VALID_COLOR_PALETTES,
+        required=False,
+        allow_null=True,
+        help_text="Color palette (optional)"
+    )
+    
+    def validate_description(self, value):
+        """Validate description is not just whitespace if provided"""
+        if value and not value.strip():
+            return None  # Treat whitespace-only as not provided
+        return value.strip() if value else None
+
+
+class CharacterExportSerializer(serializers.Serializer):
+    """
+    Serializer for exporting character parameters as JSON.
+    
+    Includes all generation parameters, character description, and metadata.
+    """
+    id = serializers.UUIDField(read_only=True)
+    description = serializers.CharField(read_only=True)
+    generation_params = serializers.DictField(read_only=True)
+    version = serializers.IntegerField(read_only=True)
+    parent_item_id = serializers.CharField(read_only=True, allow_null=True)
+    image_url = serializers.URLField(read_only=True, allow_null=True)
+    created_at = serializers.DateTimeField(read_only=True)
+    creator = serializers.CharField(read_only=True, allow_null=True)
+    decision_id = serializers.UUIDField(read_only=True)
+    decision_title = serializers.CharField(read_only=True)
+    
+    @classmethod
+    def from_decision_item(cls, item, creator_username=None):
+        """
+        Create export data from a DecisionItem.
+        
+        Args:
+            item: DecisionItem instance
+            creator_username: Optional username of the creator
+        
+        Returns:
+            Dict with export data
+        """
+        attributes = item.attributes or {}
+        
+        return {
+            'id': item.id,
+            'description': attributes.get('description', item.label),
+            'generation_params': attributes.get('generation_params', {}),
+            'version': attributes.get('version', 1),
+            'parent_item_id': attributes.get('parent_item_id'),
+            'image_url': attributes.get('image_url'),
+            'created_at': item.created_at,
+            'creator': creator_username,
+            'decision_id': item.decision_id,
+            'decision_title': item.decision.title if item.decision else None,
+        }

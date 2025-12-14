@@ -10,5 +10,12 @@ dependencies = [
     "djangorestframework>=3.16.1",
     "hypothesis>=6.148.2",
     "psycopg2-binary>=2.9.11",
+    "pytest>=9.0.2",
+    "pytest-django>=4.11.1",
     "python-decouple>=3.8",
+    "requests>=2.32.0",
 ]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "sententiam_ferre.settings"
+python_files = ["test_*.py", "*_test.py"]

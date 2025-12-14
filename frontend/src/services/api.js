@@ -166,4 +166,57 @@ export const questionnairesAPI = {
   submitAnswer: (answerData) => api.post('/answers/', answerData),
 };
 
+// Generation API (BRIA image generation)
+export const generationAPI = {
+  // Create a new character with image generation
+  createGeneration: (decisionId, generationData) => 
+    api.post(`/generations/decisions/${decisionId}/generate/`, generationData),
+  
+  // Get generation job status
+  getGenerationStatus: (jobId) => 
+    api.get(`/generations/jobs/${jobId}/status/`),
+  
+  // Retry a failed generation job
+  retryGeneration: (jobId) => 
+    api.post(`/generations/jobs/${jobId}/retry/`),
+  
+  // Get generation statistics for a decision
+  getDecisionStats: (decisionId) => 
+    api.get(`/generations/decisions/${decisionId}/stats/`),
+  
+  // List all generation jobs for a decision
+  listDecisionJobs: (decisionId, params = {}) => 
+    api.get(`/generations/decisions/${decisionId}/jobs/`, { params }),
+  
+  // Create a variation of an existing character
+  createVariation: (itemId, variationData) => 
+    api.post(`/generations/items/${itemId}/variation/`, variationData),
+  
+  // Get version information for a character item
+  getItemVersions: (itemId) => 
+    api.get(`/generations/items/${itemId}/versions/`),
+  
+  // Timeout a stale generation job and delete the associated item
+  timeoutJob: (jobId) => 
+    api.post(`/generations/jobs/${jobId}/timeout/`),
+};
+
+// Export API (character image and parameter exports)
+export const exportAPI = {
+  // Download character image file
+  // Returns blob response for file download
+  downloadImage: (itemId) => 
+    api.get(`/exports/items/${itemId}/image/`, { responseType: 'blob' }),
+  
+  // Export character parameters as JSON
+  // Returns blob response for file download
+  exportParameters: (itemId) => 
+    api.get(`/exports/items/${itemId}/json/`, { responseType: 'blob' }),
+  
+  // Batch export all approved characters as ZIP
+  // Returns blob response for file download
+  batchExport: (decisionId) => 
+    api.get(`/exports/decisions/${decisionId}/batch/`, { responseType: 'blob' }),
+};
+
 export default api;

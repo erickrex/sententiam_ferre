@@ -2,7 +2,8 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from core.views import (
     AuthViewSet, GroupViewSet, DecisionViewSet, TaxonomyViewSet, 
-    DecisionItemViewSet, VoteViewSet, MessageViewSet, QuestionViewSet, UserAnswerViewSet
+    DecisionItemViewSet, VoteViewSet, MessageViewSet, QuestionViewSet, UserAnswerViewSet,
+    GenerationViewSet, ExportViewSet
 )
 
 router = DefaultRouter()
@@ -15,6 +16,8 @@ router.register(r'votes', VoteViewSet, basename='vote')
 router.register(r'messages', MessageViewSet, basename='message')
 router.register(r'questions', QuestionViewSet, basename='question')
 router.register(r'answers', UserAnswerViewSet, basename='answer')
+router.register(r'generations', GenerationViewSet, basename='generation')
+router.register(r'exports', ExportViewSet, basename='export')
 
 urlpatterns = [
     path('', include(router.urls)),

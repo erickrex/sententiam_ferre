@@ -148,11 +148,14 @@ function DecisionDetailPage() {
     return <div className="loading-page">Loading decision...</div>;
   }
 
+  // Get the group ID for back navigation
+  const groupId = decision?.group?.id || decision?.group_id || decision?.group;
+
   if (error && !decision) {
     return (
       <div className="error-page">
         <p>{error}</p>
-        <button onClick={() => navigate(-1)} className="back-button">
+        <button onClick={() => navigate('/groups')} className="back-button">
           ← Go Back
         </button>
       </div>
@@ -162,7 +165,7 @@ function DecisionDetailPage() {
   return (
     <div className="decision-detail-page">
       <div className="page-header">
-        <button onClick={() => navigate(-1)} className="back-link">
+        <button onClick={() => navigate(groupId ? `/groups/${groupId}` : '/groups')} className="back-link">
           ← Back
         </button>
         {decision?.status === 'open' && (

@@ -46,7 +46,7 @@ function FavouritesPage() {
       <div className="favourites-page">
         <div className="error-container">
           <p className="error-message">{error}</p>
-          <button onClick={() => navigate(-1)} className="back-button">
+          <button onClick={() => navigate(`/decisions/${decisionId}`)} className="back-button">
             ← Go Back
           </button>
         </div>
@@ -57,7 +57,7 @@ function FavouritesPage() {
   return (
     <div className="favourites-page">
       <div className="page-header">
-        <button onClick={() => navigate(-1)} className="back-link">
+        <button onClick={() => navigate(`/decisions/${decisionId}`)} className="back-link">
           ← Back
         </button>
         <Link to={`/decisions/${decisionId}`} className="view-decision-link">

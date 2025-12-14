@@ -1,10 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import SwipeCardStack from '../components/SwipeCardStack';
 import Toast from '../components/Toast';
 import { itemsAPI, votingAPI, decisionsAPI } from '../services/api';
 import './VotingPage.css';
 
+/**
+ * VotingPage component for swipe-based voting on decision items.
+ * Supports both text-based items and 2D character items with images.
+ * 
+ * Requirements: 7.1, 7.2, 7.5
+ * - Display character image prominently with swipe actions
+ * - Show key parameters below the image
+ * - Skip characters that are still generating
+ */
 function VotingPage() {
   const { decisionId } = useParams();
   const navigate = useNavigate();
@@ -18,6 +27,27 @@ function VotingPage() {
   const [ratingValue, setRatingValue] = useState(3);
   const [voteHistory, setVoteHistory] = useState([]);
   const [toast, setToast] = useState(null);
+  const [pendingCount, setPendingCount] = useState(0);
+
+  /**
+   * Check if an item is ready for voting.
+   * For character items (2d_character type), they must have a completed generation
+   * with an image_url. Text-based items are always ready.
+   * 
+   * Requirement 7.5: Skip characters that are still generating
+   */
+  const isItemReadyForVoting = (item) => {
+    const attributes = item.attributes || {};
+    
+    // If it's a 2D character item, check if generation is complete
+    if (attributes.type === '2d_character') {
+      // Item must have an image_url to be ready for voting
+      return !!attributes.image_url;
+    }
+    
+    // Non-character items are always ready
+    return true;
+  };
 
   // Fetch decision and items
   useEffect(() => {
@@ -43,9 +73,18 @@ function VotingPage() {
         
         console.log('Fetched items:', fetchedItems);
         
+        // Filter out items that are still generating (Requirement 7.5)
+        const readyItems = fetchedItems.filter(isItemReadyForVoting);
+        const stillGenerating = fetchedItems.length - readyItems.length;
+        setPendingCount(stillGenerating);
+        
+        if (stillGenerating > 0) {
+          console.log(`Skipping ${stillGenerating} items still generating`);
+        }
+        
         // Filter out items the user has already voted on
         const itemsWithVotes = await Promise.all(
-          fetchedItems.map(async (item) => {
+          readyItems.map(async (item) => {
             try {
               const voteResponse = await votingAPI.getMyVote(item.id);
               // API returns { status: 'success', data: null } when no vote exists
@@ -200,6 +239,11 @@ function VotingPage() {
         </div>
         <div className="progress-text">
           {votedItems} / {totalItems} items voted
+          {pendingCount > 0 && (
+            <span className="pending-indicator">
+              ({pendingCount} still generating)
+            </span>
+          )}
         </div>
       </div>
 

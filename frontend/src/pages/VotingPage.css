@@ -60,6 +60,12 @@
   font-weight: 500;
 }
 
+.pending-indicator {
+  margin-left: 8px;
+  color: #ff9800;
+  font-size: 0.85rem;
+}
+
 .vote-controls {
   display: flex;
   justify-content: center;
