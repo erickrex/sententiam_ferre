@@ -492,52 +492,6 @@ class DecisionSelection(models.Model):
         return f"{self.item.label} selected in {self.decision.title}"
 
 
-class Conversation(models.Model):
-    """Chat thread associated with a decision"""
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    decision = models.OneToOneField(
-        Decision,
-        on_delete=models.CASCADE,
-        related_name='conversation'
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        db_table = 'conversation'
-
-    def __str__(self):
-        return f"Conversation for {self.decision.title}"
-
-
-class Message(models.Model):
-    """Individual message in a conversation"""
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    conversation = models.ForeignKey(
-        Conversation,
-        on_delete=models.CASCADE,
-        related_name='messages'
-    )
-    sender = models.ForeignKey(
-        UserAccount,
-        on_delete=models.CASCADE,
-        related_name='messages'
-    )
-    text = models.TextField()
-    sent_at = models.DateTimeField(auto_now_add=True)
-    is_read = models.BooleanField(default=False)
-
-    class Meta:
-        db_table = 'message'
-        indexes = [
-            models.Index(fields=['conversation', 'sent_at']),
-            models.Index(fields=['sender']),
-        ]
-        ordering = ['sent_at']
-
-    def __str__(self):
-        return f"Message from {self.sender.username} at {self.sent_at}"
-
-
 class Taxonomy(models.Model):
     """Classification system for organizing items"""
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

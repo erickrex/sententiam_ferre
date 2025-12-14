@@ -3,7 +3,6 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { decisionsAPI, itemsAPI } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import DecisionDetail from '../components/DecisionDetail';
-import ChatView from '../components/ChatView';
 import './DecisionDetailPage.css';
 
 // Simple Items Tab component with pagination
@@ -201,12 +200,6 @@ function DecisionDetailPage() {
         >
           Favourites ({favourites.length})
         </button>
-        <button
-          className={`tab ${activeTab === 'chat' ? 'active' : ''}`}
-          onClick={() => setActiveTab('chat')}
-        >
-          Chat
-        </button>
       </div>
 
       <div className="tab-content">
@@ -278,14 +271,6 @@ function DecisionDetailPage() {
           </div>
         )}
 
-        {activeTab === 'chat' && (
-          <div className="chat-tab">
-            <ChatView 
-              decisionId={decisionId}
-              isClosed={decision?.status === 'closed' || decision?.status === 'archived'}
-            />
-          </div>
-        )}
       </div>
     </div>
   );

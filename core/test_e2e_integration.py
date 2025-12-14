@@ -10,7 +10,7 @@ from rest_framework.test import APIClient
 from rest_framework import status
 from core.models import (
     AppGroup, GroupMembership, Decision, DecisionItem, 
-    DecisionVote, DecisionSelection, Conversation, Message,
+    DecisionVote, DecisionSelection,
     Taxonomy, Term, DecisionItemTerm
 )
 import json
@@ -187,60 +187,6 @@ class EndToEndIntegrationTests(TestCase):
         self.assertIsNotNone(italian_selection)
         self.assertIsNotNone(italian_selection.snapshot)
 
-    def test_chat_functionality_across_users(self):
-        """Test chat functionality with multiple users sending and receiving messages"""
-        # Setup: Create users, group, and decision
-        user1 = User.objects.create_user(username='user1', email='user1@test.com', password='Pass123!')
-        user2 = User.objects.create_user(username='user2', email='user2@test.com', password='Pass123!')
-        
-        self.client1.force_authenticate(user=user1)
-        self.client2.force_authenticate(user=user2)
-
-        # Create group
-        group = AppGroup.objects.create(name='Chat Group', created_by=user1)
-        GroupMembership.objects.create(group=group, user=user1, role='admin', is_confirmed=True)
-        GroupMembership.objects.create(group=group, user=user2, role='member', is_confirmed=True)
-
-        # Create decision
-        decision = Decision.objects.create(
-            group=group,
-            title='Test Decision',
-            item_type='test',
-            rules={'type': 'unanimous'},
-            status='open'
-        )
-
-        # Get or create conversation
-        response = self.client1.get(f'/api/v1/decisions/{decision.id}/conversation/')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        # User 1 sends message
-        message_data_1 = {'text': 'Hello from user 1'}
-        response = self.client1.post(f'/api/v1/decisions/{decision.id}/messages/', message_data_1, format='json')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
-        # User 2 sends message
-        message_data_2 = {'text': 'Hello from user 2'}
-        response = self.client2.post(f'/api/v1/decisions/{decision.id}/messages/', message_data_2, format='json')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
-        # User 1 retrieves messages
-        response = self.client1.get(f'/api/v1/decisions/{decision.id}/messages/')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        
-        # Messages are in data.results
-        messages = response.data.get('data', {}).get('results', [])
-        self.assertEqual(len(messages), 2)
-
-        # Verify chronological ordering
-        self.assertEqual(messages[0]['text'], 'Hello from user 1')
-        self.assertEqual(messages[1]['text'], 'Hello from user 2')
-        self.assertLessEqual(messages[0]['sent_at'], messages[1]['sent_at'])
-
-        # Verify sender information
-        self.assertEqual(messages[0]['sender_username'], 'user1')
-        self.assertEqual(messages[1]['sender_username'], 'user2')
-
     def test_filtering_and_search_combinations(self):
         """Test filtering and search with various tag and attribute combinations"""
         # Setup
@@ -373,19 +319,7 @@ class EndToEndIntegrationTests(TestCase):
         )
         self.assertIn(response.status_code, [status.HTTP_403_FORBIDDEN, status.HTTP_404_NOT_FOUND])
 
-        # Test 4: Non-member cannot access chat
-        response = self.client_non_member.get(f'/api/v1/decisions/{decision.id}/conversation/')
-        self.assertIn(response.status_code, [status.HTTP_403_FORBIDDEN, status.HTTP_404_NOT_FOUND])
-
-        # Test 5: Non-member cannot send messages
-        response = self.client_non_member.post(
-            f'/api/v1/decisions/{decision.id}/messages/',
-            {'text': 'Unauthorized message'},
-            format='json'
-        )
-        self.assertIn(response.status_code, [status.HTTP_403_FORBIDDEN, status.HTTP_404_NOT_FOUND])
-
-        # Test 6: Member CAN access all resources
+        # Test 4: Member CAN access all resources
         response = self.client1.get(f'/api/v1/groups/{group.id}/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 

@@ -144,14 +144,6 @@ export const votingAPI = {
   deleteVote: (itemId) => api.delete(`/votes/items/${itemId}/votes/`),
 };
 
-// Chat API
-export const chatAPI = {
-  getConversation: (decisionId) => api.get(`/decisions/${decisionId}/conversation/`),
-  listMessages: (decisionId, params) => api.get(`/decisions/${decisionId}/messages/`, { params }),
-  sendMessage: (decisionId, messageData) => api.post(`/decisions/${decisionId}/messages/`, messageData),
-  markAsRead: (messageId) => api.patch(`/messages/${messageId}/`, { is_read: true }),
-};
-
 // Taxonomies API
 export const taxonomiesAPI = {
   list: () => api.get('/taxonomies/'),

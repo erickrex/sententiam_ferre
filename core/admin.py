@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .models import (
     UserAccount, AppGroup, GroupMembership, Decision, DecisionSharedGroup,
     CatalogItem, DecisionItem, DecisionVote, DecisionSelection,
-    Conversation, Message, Taxonomy, Term, DecisionItemTerm, CatalogItemTerm,
+    Taxonomy, Term, DecisionItemTerm, CatalogItemTerm,
     Question, AnswerOption, UserAnswer
 )
 
@@ -74,20 +74,6 @@ class DecisionSelectionAdmin(admin.ModelAdmin):
     list_display = ['decision', 'item', 'selected_at']
     list_filter = ['selected_at']
     raw_id_fields = ['decision', 'item']
-
-
-@admin.register(Conversation)
-class ConversationAdmin(admin.ModelAdmin):
-    list_display = ['decision', 'created_at']
-    raw_id_fields = ['decision']
-
-
-@admin.register(Message)
-class MessageAdmin(admin.ModelAdmin):
-    list_display = ['sender', 'conversation', 'text', 'sent_at', 'is_read']
-    list_filter = ['is_read', 'sent_at']
-    search_fields = ['text']
-    raw_id_fields = ['sender', 'conversation']
 
 
 @admin.register(Taxonomy)

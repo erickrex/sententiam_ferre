@@ -5,7 +5,7 @@ from django.utils import timezone
 from core.models import (
     UserAccount, AppGroup, GroupMembership, Decision, DecisionSharedGroup, 
     Taxonomy, Term, DecisionItem, CatalogItem, DecisionItemTerm, CatalogItemTerm,
-    DecisionVote, DecisionSelection, Conversation, Message, Question, AnswerOption, UserAnswer
+    DecisionVote, DecisionSelection, Question, AnswerOption, UserAnswer
 )
 
 
@@ -664,57 +664,6 @@ class DecisionSelectionSerializer(serializers.ModelSerializer):
         fields = ['id', 'decision', 'decision_title', 'item', 'selected_at', 'snapshot']
         read_only_fields = ['id', 'decision', 'item', 'selected_at', 'snapshot']
 
-
-
-class ConversationSerializer(serializers.ModelSerializer):
-    """Serializer for Conversation model"""
-    decision_title = serializers.CharField(source='decision.title', read_only=True)
-    message_count = serializers.SerializerMethodField()
-    
-    class Meta:
-        model = Conversation
-        fields = ['id', 'decision', 'decision_title', 'created_at', 'message_count']
-        read_only_fields = ['id', 'created_at']
-    
-    def get_message_count(self, obj):
-        """Get count of messages in this conversation"""
-        return obj.messages.count()
-
-
-class MessageSerializer(serializers.ModelSerializer):
-    """Serializer for Message model"""
-    sender_username = serializers.CharField(source='sender.username', read_only=True)
-    sender_id = serializers.UUIDField(source='sender.id', read_only=True)
-    
-    class Meta:
-        model = Message
-        fields = [
-            'id', 'conversation', 'sender', 'sender_id', 'sender_username',
-            'text', 'sent_at', 'is_read'
-        ]
-        read_only_fields = ['id', 'sender', 'sent_at']
-
-
-class MessageCreateSerializer(serializers.ModelSerializer):
-    """Serializer for creating messages"""
-    
-    class Meta:
-        model = Message
-        fields = ['conversation', 'text']
-    
-    def validate_text(self, value):
-        """Validate that message text is not empty"""
-        if not value or not value.strip():
-            raise serializers.ValidationError("Message text cannot be empty")
-        return value
-
-
-class MessageUpdateSerializer(serializers.ModelSerializer):
-    """Serializer for updating message read status"""
-    
-    class Meta:
-        model = Message
-        fields = ['is_read']
 
 
 class AnswerOptionSerializer(serializers.ModelSerializer):

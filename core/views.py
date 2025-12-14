@@ -10,7 +10,7 @@ from core.throttles import LoginRateThrottle
 from core.models import (
     UserAccount, AppGroup, GroupMembership, Decision, Taxonomy, Term,
     DecisionItem, CatalogItem, DecisionItemTerm, DecisionVote, DecisionSelection,
-    Conversation, Message, Question, AnswerOption, UserAnswer
+    Question, AnswerOption, UserAnswer
 )
 from core.serializers import (
     UserAccountSerializer,
@@ -33,10 +33,6 @@ from core.serializers import (
     DecisionVoteSerializer,
     VoteSummarySerializer,
     DecisionSelectionSerializer,
-    ConversationSerializer,
-    MessageSerializer,
-    MessageCreateSerializer,
-    MessageUpdateSerializer,
     QuestionSerializer,
     UserAnswerSerializer,
     UserAnswerCreateSerializer
@@ -1480,30 +1476,6 @@ class DecisionViewSet(viewsets.ModelViewSet):
                 'message': 'Decision not found or access denied'
             }, status=status.HTTP_404_NOT_FOUND)
     
-    @action(detail=True, methods=['get'], url_path='conversation')
-    def get_conversation(self, request, pk=None):
-        """
-        Get or create conversation for a decision
-        GET /api/v1/decisions/:id/conversation
-        """
-        try:
-            decision = self.get_queryset().get(pk=pk)
-            
-            # Get or create conversation
-            conversation, created = Conversation.objects.get_or_create(decision=decision)
-            
-            serializer = ConversationSerializer(conversation)
-            
-            return Response({
-                'status': 'success',
-                'data': serializer.data
-            }, status=status.HTTP_200_OK)
-        except Decision.DoesNotExist:
-            return Response({
-                'status': 'error',
-                'message': 'Decision not found or access denied'
-            }, status=status.HTTP_404_NOT_FOUND)
-    
     @action(detail=True, methods=['get', 'post'], url_path='items')
     def items(self, request, pk=None):
         """
@@ -1631,102 +1603,6 @@ class DecisionViewSet(viewsets.ModelViewSet):
                 'status': 'success',
                 'data': DecisionItemSerializer(item).data
             }, status=status.HTTP_201_CREATED)
-    
-    @action(detail=True, methods=['get', 'post'], url_path='messages')
-    def messages(self, request, pk=None):
-        """
-        List or send messages in a decision's conversation
-        GET /api/v1/decisions/:id/messages - List messages
-        POST /api/v1/decisions/:id/messages - Send a message
-        """
-        try:
-            decision = self.get_queryset().get(pk=pk)
-            
-            if request.method == 'POST':
-                # Send a message
-                # Get or create conversation
-                conversation, created = Conversation.objects.get_or_create(decision=decision)
-                
-                # Create message
-                message_data = {
-                    'conversation': conversation.id,
-                    'text': request.data.get('text')
-                }
-                
-                serializer = MessageCreateSerializer(data=message_data)
-                
-                if serializer.is_valid():
-                    message = serializer.save(sender=request.user)
-                    
-                    # Return the created message with full details
-                    response_serializer = MessageSerializer(message)
-                    
-                    return Response({
-                        'status': 'success',
-                        'data': response_serializer.data
-                    }, status=status.HTTP_201_CREATED)
-                
-                return Response({
-                    'status': 'error',
-                    'message': 'Invalid message data',
-                    'errors': serializer.errors
-                }, status=status.HTTP_400_BAD_REQUEST)
-            
-            else:  # GET
-                # List messages
-                # Get conversation
-                try:
-                    conversation = Conversation.objects.get(decision=decision)
-                except Conversation.DoesNotExist:
-                    # No conversation yet, return empty list
-                    return Response({
-                        'status': 'success',
-                        'data': {
-                            'results': [],
-                            'count': 0
-                        }
-                    }, status=status.HTTP_200_OK)
-                
-                # Get messages ordered by sent_at with sender info
-                messages = Message.objects.filter(
-                    conversation=conversation
-                ).select_related('sender').order_by('sent_at')
-                
-                # Apply pagination if needed
-                page = request.query_params.get('page')
-                page_size = request.query_params.get('page_size', 50)
-                
-                if page:
-                    from django.core.paginator import Paginator
-                    paginator = Paginator(messages, page_size)
-                    page_obj = paginator.get_page(page)
-                    serializer = MessageSerializer(page_obj, many=True)
-                    
-                    return Response({
-                        'status': 'success',
-                        'data': {
-                            'results': serializer.data,
-                            'count': paginator.count,
-                            'page': page_obj.number,
-                            'total_pages': paginator.num_pages
-                        }
-                    }, status=status.HTTP_200_OK)
-                else:
-                    serializer = MessageSerializer(messages, many=True)
-                    
-                    return Response({
-                        'status': 'success',
-                        'data': {
-                            'results': serializer.data,
-                            'count': messages.count()
-                        }
-                    }, status=status.HTTP_200_OK)
-            
-        except Decision.DoesNotExist:
-            return Response({
-                'status': 'error',
-                'message': 'Decision not found or access denied'
-            }, status=status.HTTP_404_NOT_FOUND)
     
     @action(detail=True, methods=['post'], url_path='lock-parameter')
     def lock_parameter(self, request, pk=None):
@@ -2738,79 +2614,6 @@ class VoteViewSet(viewsets.GenericViewSet):
                 'status': 'error',
                 'message': 'Item not found'
             }, status=status.HTTP_404_NOT_FOUND)
-
-
-class MessageViewSet(viewsets.GenericViewSet):
-    """ViewSet for message operations"""
-    permission_classes = [IsAuthenticated]
-    serializer_class = MessageSerializer
-    queryset = Message.objects.all()
-    
-    @action(detail=True, methods=['patch'], url_path='mark-read')
-    def mark_read(self, request, pk=None):
-        """
-        Mark a message as read
-        PATCH /api/v1/messages/:id/mark-read
-        """
-        try:
-            # Get the message
-            message = Message.objects.get(pk=pk)
-            
-            # Check if user is a confirmed member of the decision's group
-            decision = message.conversation.decision
-            
-            # Check if user is a confirmed member of the decision's group or shared groups
-            is_member = GroupMembership.objects.filter(
-                group=decision.group,
-                user=request.user,
-                is_confirmed=True
-            ).exists()
-            
-            if not is_member:
-                # Check if user is in a shared group
-                from core.models import DecisionSharedGroup
-                shared_groups = DecisionSharedGroup.objects.filter(
-                    decision=decision
-                ).values_list('group_id', flat=True)
-                
-                is_member = GroupMembership.objects.filter(
-                    group_id__in=shared_groups,
-                    user=request.user,
-                    is_confirmed=True
-                ).exists()
-            
-            if not is_member:
-                return Response({
-                    'status': 'error',
-                    'message': 'You do not have permission to access this message'
-                }, status=status.HTTP_403_FORBIDDEN)
-            
-            # Update the message
-            serializer = MessageUpdateSerializer(message, data={'is_read': True}, partial=True)
-            
-            if serializer.is_valid():
-                serializer.save()
-                
-                # Return the updated message
-                response_serializer = MessageSerializer(message)
-                
-                return Response({
-                    'status': 'success',
-                    'data': response_serializer.data
-                }, status=status.HTTP_200_OK)
-            
-            return Response({
-                'status': 'error',
-                'message': 'Invalid data',
-                'errors': serializer.errors
-            }, status=status.HTTP_400_BAD_REQUEST)
-            
-        except Message.DoesNotExist:
-            return Response({
-                'status': 'error',
-                'message': 'Message not found'
-            }, status=status.HTTP_404_NOT_FOUND)
-
 
 
 class QuestionViewSet(viewsets.ReadOnlyModelViewSet):
