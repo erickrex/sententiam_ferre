@@ -16,12 +16,12 @@
   margin: 0 0 0.5rem 0;
   font-size: 1.75rem;
   font-weight: 700;
-  color: #1a1a1a;
+  color: var(--text-primary, #fff);
 }
 
 .group-description {
   margin: 0;
-  color: #666;
+  color: var(--text-muted, #b0b0b0);
   font-size: 1rem;
   line-height: 1.6;
 }
@@ -31,18 +31,18 @@
   padding: 0.875rem;
   font-size: 1rem;
   font-weight: 600;
-  background-color: #646cff;
+  background: var(--accent-gradient, linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%));
   color: white;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
   min-height: 44px;
 }
 
 .invite-button:hover {
-  background-color: #535bf2;
-  border-color: transparent;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(108, 92, 231, 0.5);
 }
 
 .members-section,
@@ -54,7 +54,7 @@
   margin: 0 0 1rem 0;
   font-size: 1.25rem;
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--text-primary, #fff);
 }
 
 .member-list {
@@ -68,14 +68,14 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  background: white;
-  border: 1px solid #e0e0e0;
+  background: var(--bg-card, #1e1e3f);
+  border: 1px solid var(--border-color, #4a4a6a);
   border-radius: 8px;
   gap: 1rem;
 }
 
 .member-item.pending {
-  background: #f9f9f9;
+  background: var(--bg-tertiary, #0f0f23);
 }
 
 .member-info {
@@ -88,7 +88,7 @@
 
 .member-name {
   font-weight: 500;
-  color: #1a1a1a;
+  color: var(--text-primary, #fff);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -106,13 +106,13 @@
 }
 
 .role-badge.admin {
-  background-color: #646cff;
+  background: var(--accent-gradient, linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%));
   color: white;
 }
 
 .status-badge.pending {
-  background-color: #ffa726;
-  color: white;
+  background: linear-gradient(135deg, var(--warning-color, #f39c12) 0%, var(--warning-light, #ffeaa7) 100%);
+  color: #000;
 }
 
 .member-actions {
@@ -124,9 +124,9 @@
 .accept-button {
   padding: 0.5rem 1rem;
   font-size: 0.875rem;
-  background-color: #4caf50;
+  background: var(--success-gradient, linear-gradient(135deg, #00b894 0%, #55efc4 100%));
   color: white;
-  border: 1px solid #4caf50;
+  border: none;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s;
@@ -136,16 +136,16 @@
 }
 
 .accept-button:hover {
-  background-color: #43a047;
-  border-color: #43a047;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 184, 148, 0.4);
 }
 
 .remove-button {
   padding: 0.5rem 1rem;
   font-size: 0.875rem;
   background-color: transparent;
-  color: #ff4444;
-  border: 1px solid #ff4444;
+  color: var(--error-light, #ff6b6b);
+  border: 1px solid var(--error-color, #e74c3c);
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s;
@@ -155,14 +155,14 @@
 }
 
 .remove-button:hover {
-  background-color: #ff4444;
+  background: var(--error-gradient, linear-gradient(135deg, #e74c3c 0%, #ff6b6b 100%));
   color: white;
-  border-color: #ff4444;
+  border-color: transparent;
 }
 
 .empty-message {
   text-align: center;
-  color: #888;
+  color: var(--text-muted, #b0b0b0);
   padding: 2rem 1rem;
   margin: 0;
 }
@@ -170,53 +170,7 @@
 .loading {
   text-align: center;
   padding: 2rem 1rem;
-  color: #666;
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .group-title,
-  .section-title {
-    color: rgba(255, 255, 255, 0.87);
-  }
-  
-  .group-description {
-    color: rgba(255, 255, 255, 0.6);
-  }
-  
-  .member-item {
-    background: #1a1a1a;
-    border-color: #444;
-  }
-  
-  .member-item.pending {
-    background: #252525;
-  }
-  
-  .member-name {
-    color: rgba(255, 255, 255, 0.87);
-  }
-  
-  .accept-button {
-    background-color: #66bb6a;
-    border-color: #66bb6a;
-  }
-  
-  .accept-button:hover {
-    background-color: #57a05a;
-    border-color: #57a05a;
-  }
-  
-  .remove-button {
-    color: #ff6b6b;
-    border-color: #ff6b6b;
-  }
-  
-  .remove-button:hover {
-    background-color: #ff6b6b;
-    color: white;
-    border-color: #ff6b6b;
-  }
+  color: var(--text-muted, #b0b0b0);
 }
 
 /* Tablet and desktop */

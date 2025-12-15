@@ -6,12 +6,14 @@ import ItemFilter from '../components/ItemFilter';
 import Toast from '../components/Toast';
 import CharacterCreationForm from '../components/CharacterCreationForm';
 import CharacterGallery from '../components/CharacterGallery';
-import { itemsAPI, taxonomiesAPI, decisionsAPI, generationAPI } from '../services/api';
+import { itemsAPI, taxonomiesAPI, decisionsAPI, generationAPI, groupsAPI } from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
 import './ItemManagementPage.css';
 
 function ItemManagementPage() {
   const { decisionId } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   
   const [decision, setDecision] = useState(null);
   const [items, setItems] = useState([]);
@@ -45,10 +47,19 @@ function ItemManagementPage() {
       
       // Load decision details
       const decisionResponse = await decisionsAPI.get(decisionId);
-      setDecision(decisionResponse.data.data);
+      const decisionData = decisionResponse.data.data;
+      setDecision(decisionData);
       
-      // Check if user is admin (simplified - in real app, check membership role)
-      setIsAdmin(true);
+      // Check if user is admin of the group
+      try {
+        const membersResponse = await groupsAPI.listMembers(decisionData.group);
+        const members = membersResponse.data.data || [];
+        const currentUserMembership = members.find(m => m.user?.id === user?.id);
+        setIsAdmin(currentUserMembership?.role === 'admin');
+      } catch (err) {
+        console.error('Failed to check admin status:', err);
+        setIsAdmin(false);
+      }
       
       // Load taxonomies with terms
       const taxonomiesResponse = await taxonomiesAPI.list();
@@ -147,12 +158,6 @@ function ItemManagementPage() {
       parentItemId: item.id,
     });
     setShowAddForm(true);
-  };
-
-  // Handle viewing character details
-  const handleViewDetails = (item) => {
-    // Could navigate to a detail page or show a modal
-    console.log('View details for:', item);
   };
 
   const handleEditItem = async (itemData) => {
@@ -269,8 +274,9 @@ function ItemManagementPage() {
           <CharacterGallery
             decisionId={decisionId}
             onCreateVariation={handleCreateVariation}
-            onViewDetails={handleViewDetails}
+            onDeleteItem={handleDeleteItem}
             refreshTrigger={refreshTrigger}
+            isAdmin={isAdmin}
           />
         </div>
       )}

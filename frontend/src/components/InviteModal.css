@@ -5,7 +5,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.7);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -14,13 +14,14 @@
 }
 
 .modal-content {
-  background: white;
+  background: var(--bg-card, #1e1e3f);
   border-radius: 12px;
   width: 100%;
   max-width: 500px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-lg, 0 8px 30px rgba(0, 0, 0, 0.5));
+  border: 1px solid var(--border-color, #4a4a6a);
 }
 
 .modal-header {
@@ -28,14 +29,14 @@
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--border-color, #4a4a6a);
 }
 
 .modal-title {
   margin: 0;
   font-size: 1.5rem;
   font-weight: 700;
-  color: #1a1a1a;
+  color: var(--text-primary, #ffffff);
 }
 
 .close-button {
@@ -44,7 +45,7 @@
   font-size: 2rem;
   line-height: 1;
   cursor: pointer;
-  color: #666;
+  color: var(--text-muted, #b0b0b0);
   padding: 0;
   width: 44px;
   height: 44px;
@@ -56,8 +57,8 @@
 }
 
 .close-button:hover:not(:disabled) {
-  background-color: #f5f5f5;
-  color: #1a1a1a;
+  background-color: var(--bg-hover, #252550);
+  color: var(--text-primary, #ffffff);
   border-color: transparent;
 }
 
@@ -72,13 +73,13 @@
 
 .invite-description {
   margin: 0 0 1.5rem 0;
-  color: #666;
+  color: var(--text-muted, #b0b0b0);
   font-size: 0.95rem;
   line-height: 1.5;
 }
 
 .invite-description strong {
-  color: #1a1a1a;
+  color: var(--text-primary, #ffffff);
   font-weight: 600;
 }
 
@@ -91,31 +92,37 @@
   margin-bottom: 0.5rem;
   font-weight: 500;
   font-size: 0.95rem;
-  color: #1a1a1a;
+  color: var(--text-secondary, #e8e8e8);
 }
 
 .form-group input {
   width: 100%;
   padding: 0.75rem;
   font-size: 1rem;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border-color, #4a4a6a);
   border-radius: 8px;
   box-sizing: border-box;
   transition: border-color 0.2s;
+  background-color: var(--bg-tertiary, #0f0f23);
+  color: var(--text-primary, #ffffff);
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: #646cff;
+  border-color: var(--accent-primary, #6c5ce7);
 }
 
 .form-group input.error {
-  border-color: #ff4444;
+  border-color: var(--error-color, #e74c3c);
+}
+
+.form-group input::placeholder {
+  color: var(--text-dim, #9a9a9a);
 }
 
 .error-message {
   display: block;
-  color: #ff4444;
+  color: var(--error-light, #ff6b6b);
   font-size: 0.85rem;
   margin-top: 0.25rem;
 }
@@ -124,7 +131,7 @@
   display: flex;
   gap: 1rem;
   padding: 1.5rem;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--border-color, #4a4a6a);
 }
 
 .cancel-button,
@@ -142,22 +149,24 @@
 
 .cancel-button {
   background-color: transparent;
-  color: #666;
-  border: 1px solid #ccc;
+  color: var(--text-muted, #b0b0b0);
+  border: 1px solid var(--border-color, #4a4a6a);
 }
 
 .cancel-button:hover:not(:disabled) {
-  background-color: #f5f5f5;
-  border-color: #999;
+  background-color: var(--bg-hover, #252550);
+  border-color: var(--border-light, #5a5a7a);
+  color: var(--text-secondary, #e8e8e8);
 }
 
 .submit-button {
-  background-color: #646cff;
-  color: white;
+  background: var(--accent-gradient, linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%));
+  color: var(--text-primary, #ffffff);
 }
 
 .submit-button:hover:not(:disabled) {
-  background-color: #535bf2;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-accent, 0 4px 15px rgba(108, 92, 231, 0.3));
   border-color: transparent;
 }
 
@@ -165,63 +174,6 @@
 .submit-button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .modal-content {
-    background: #1a1a1a;
-  }
-  
-  .modal-header {
-    border-bottom-color: #444;
-  }
-  
-  .modal-title,
-  .form-group label {
-    color: rgba(255, 255, 255, 0.87);
-  }
-  
-  .close-button {
-    color: rgba(255, 255, 255, 0.6);
-  }
-  
-  .close-button:hover:not(:disabled) {
-    background-color: #2a2a2a;
-    color: rgba(255, 255, 255, 0.87);
-  }
-  
-  .invite-description {
-    color: rgba(255, 255, 255, 0.6);
-  }
-  
-  .invite-description strong {
-    color: rgba(255, 255, 255, 0.87);
-  }
-  
-  .form-group input {
-    background-color: #252525;
-    border-color: #444;
-    color: rgba(255, 255, 255, 0.87);
-  }
-  
-  .form-group input:focus {
-    border-color: #646cff;
-  }
-  
-  .modal-footer {
-    border-top-color: #444;
-  }
-  
-  .cancel-button {
-    color: rgba(255, 255, 255, 0.6);
-    border-color: #444;
-  }
-  
-  .cancel-button:hover:not(:disabled) {
-    background-color: #2a2a2a;
-    border-color: #666;
-  }
 }
 
 /* Tablet and desktop */

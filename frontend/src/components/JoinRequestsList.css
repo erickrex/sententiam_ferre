@@ -10,20 +10,21 @@
 }
 
 .join-requests-list .empty-message {
-  color: #666;
+  color: var(--text-muted, #b0b0b0);
   font-style: italic;
 }
 
 .join-requests-list .request-card {
-  background: white;
-  border: 1px solid #e0e0e0;
+  background: var(--bg-card, #1e1e3f);
+  border: 1px solid var(--border-color, #4a4a6a);
   border-radius: 8px;
   padding: 1rem;
-  transition: box-shadow 0.2s;
+  transition: all 0.2s;
 }
 
 .join-requests-list .request-card:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md, 0 4px 15px rgba(0, 0, 0, 0.4));
+  border-color: var(--accent-primary, #6c5ce7);
 }
 
 .join-requests-list .request-header {
@@ -37,7 +38,7 @@
   margin: 0;
   font-size: 1.1rem;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary, #fff);
 }
 
 .join-requests-list .request-info {
@@ -45,7 +46,7 @@
 }
 
 .join-requests-list .request-date {
-  color: #666;
+  color: var(--text-muted, #b0b0b0);
   font-size: 0.9rem;
 }
 
@@ -68,21 +69,23 @@
 }
 
 .join-requests-list .approve-button {
-  background-color: #4caf50;
+  background: var(--success-gradient, linear-gradient(135deg, #00b894 0%, #55efc4 100%));
   color: white;
 }
 
 .join-requests-list .approve-button:hover:not(:disabled) {
-  background-color: #45a049;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 184, 148, 0.4);
 }
 
 .join-requests-list .reject-button {
-  background-color: #f44336;
+  background: var(--error-gradient, linear-gradient(135deg, #e74c3c 0%, #ff6b6b 100%));
   color: white;
 }
 
 .join-requests-list .reject-button:hover:not(:disabled) {
-  background-color: #da190b;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
 }
 
 .join-requests-list .approve-button:disabled,

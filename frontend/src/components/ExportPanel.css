@@ -1,15 +1,15 @@
 .export-panel {
   padding: 1rem;
-  background: var(--surface-color, #f8f9fa);
+  background: var(--bg-secondary, #16213e);
   border-radius: 8px;
-  border: 1px solid var(--border-color, #e0e0e0);
+  border: 1px solid var(--border-color, #4a4a6a);
 }
 
 .export-panel-title {
   margin: 0 0 0.75rem 0;
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--text-secondary, #666);
+  color: var(--text-muted, #b0b0b0);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -60,13 +60,13 @@
 
 /* Image download button */
 .export-btn.image-btn {
-  background: var(--primary-color, #4a90d9);
+  background: var(--accent-gradient, linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%));
   color: white;
 }
 
 .export-btn.image-btn:hover:not(:disabled) {
-  background: var(--primary-hover, #3a7bc8);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);
 }
 
 .export-btn.image-btn:active:not(:disabled) {
@@ -75,13 +75,15 @@
 
 /* JSON export button */
 .export-btn.json-btn {
-  background: var(--secondary-color, #6c757d);
-  color: white;
+  background: var(--bg-tertiary, #0f0f23);
+  color: var(--text-secondary, #e8e8e8);
+  border: 1px solid var(--border-color, #4a4a6a);
 }
 
 .export-btn.json-btn:hover:not(:disabled) {
-  background: var(--secondary-hover, #5a6268);
-  transform: translateY(-1px);
+  background: var(--bg-hover, #252550);
+  border-color: var(--accent-primary, #6c5ce7);
+  transform: translateY(-2px);
 }
 
 .export-btn.json-btn:active:not(:disabled) {
@@ -96,17 +98,5 @@
   
   .export-btn {
     flex: 1;
-  }
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .export-panel {
-    background: var(--surface-color-dark, #2d2d2d);
-    border-color: var(--border-color-dark, #404040);
-  }
-  
-  .export-panel-title {
-    color: var(--text-secondary-dark, #aaa);
   }
 }

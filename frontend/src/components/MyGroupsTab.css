@@ -9,13 +9,13 @@
 .my-groups-tab .section-title {
   font-size: 1.5rem;
   font-weight: 600;
-  color: var(--text-primary, #1a1a1a);
+  color: var(--text-primary, #ffffff);
   margin: 0 0 0.5rem 0;
 }
 
 .my-groups-tab .section-description {
   font-size: 0.95rem;
-  color: var(--text-secondary, #666);
+  color: var(--text-secondary, #e8e8e8);
   margin: 0;
 }
 

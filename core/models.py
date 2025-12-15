@@ -261,6 +261,12 @@ class CatalogItem(models.Model):
 
 class DecisionItem(models.Model):
     """Item within a decision that users can vote on"""
+    
+    ITEM_STATUS_CHOICES = [
+        ('draft', 'Draft'),        # Only visible to creator, can regenerate
+        ('published', 'Published'), # Visible to all group members, votable
+    ]
+    
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     decision = models.ForeignKey(
         Decision,
@@ -277,6 +283,18 @@ class DecisionItem(models.Model):
     label = models.CharField(max_length=255)
     attributes = models.JSONField(null=True, blank=True)
     external_ref = models.CharField(max_length=255, null=True, blank=True)
+    status = models.CharField(
+        max_length=20,
+        choices=ITEM_STATUS_CHOICES,
+        default='published'
+    )
+    created_by = models.ForeignKey(
+        'UserAccount',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='created_items'
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -285,10 +303,33 @@ class DecisionItem(models.Model):
         indexes = [
             models.Index(fields=['decision']),
             models.Index(fields=['catalog_item']),
+            models.Index(fields=['status']),
+            models.Index(fields=['created_by']),
+            models.Index(fields=['decision', 'status']),
         ]
 
     def __str__(self):
         return self.label
+    
+    def publish(self):
+        """Publish a draft item so it becomes visible and votable."""
+        if self.status == 'draft':
+            self.status = 'published'
+            self.save(update_fields=['status'])
+            return True
+        return False
+    
+    def is_draft(self):
+        """Check if item is in draft status."""
+        return self.status == 'draft'
+    
+    def is_published(self):
+        """Check if item is published."""
+        return self.status == 'published'
+    
+    def can_edit(self, user):
+        """Check if user can edit this item (only drafts by creator)."""
+        return self.status == 'draft' and self.created_by == user
     
     # Character versioning helper methods
     

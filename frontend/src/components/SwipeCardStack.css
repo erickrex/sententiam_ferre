@@ -60,13 +60,13 @@
 }
 
 .swipe-overlay-like {
-  background: rgba(76, 175, 80, 0.3);
-  border: 4px solid #4caf50;
+  background: rgba(0, 184, 148, 0.3);
+  border: 4px solid var(--success-color, #00b894);
 }
 
 .swipe-overlay-dislike {
-  background: rgba(244, 67, 54, 0.3);
-  border: 4px solid #f44336;
+  background: rgba(231, 76, 60, 0.3);
+  border: 4px solid var(--error-color, #e74c3c);
 }
 
 .overlay-text {
@@ -84,12 +84,12 @@
 .no-items-message {
   text-align: center;
   padding: 40px;
-  color: #666;
+  color: var(--text-muted, #b0b0b0);
 }
 
 .no-items-message h2 {
   margin-bottom: 12px;
-  color: #333;
+  color: var(--text-primary, #fff);
 }
 
 .no-items-message p {

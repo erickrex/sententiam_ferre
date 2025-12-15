@@ -6,8 +6,8 @@
 }
 
 .group-card {
-  background: white;
-  border: 1px solid #e0e0e0;
+  background: var(--bg-card, #1e1e3f);
+  border: 1px solid var(--border-color, #4a4a6a);
   border-radius: 12px;
   padding: 1.25rem;
   text-decoration: none;
@@ -17,8 +17,8 @@
 }
 
 .group-card:hover {
-  border-color: #646cff;
-  box-shadow: 0 2px 8px rgba(100, 108, 255, 0.1);
+  border-color: var(--accent-primary, #6c5ce7);
+  box-shadow: var(--shadow-md, 0 4px 15px rgba(0, 0, 0, 0.4));
   transform: translateY(-2px);
 }
 
@@ -38,12 +38,12 @@
   margin: 0;
   font-size: 1.25rem;
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--text-primary, #fff);
   flex: 1;
 }
 
 .admin-badge {
-  background-color: #646cff;
+  background: var(--accent-gradient, linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%));
   color: white;
   padding: 0.25rem 0.625rem;
   border-radius: 12px;
@@ -56,7 +56,7 @@
 
 .group-description {
   margin: 0 0 1rem 0;
-  color: #666;
+  color: var(--text-muted, #b0b0b0);
   font-size: 0.95rem;
   line-height: 1.5;
   display: -webkit-box;
@@ -69,7 +69,7 @@
   display: flex;
   gap: 1rem;
   font-size: 0.875rem;
-  color: #888;
+  color: var(--text-dim, #9a9a9a);
 }
 
 .member-count,
@@ -83,14 +83,15 @@
 .empty-state {
   text-align: center;
   padding: 2rem 1rem;
-  color: #666;
+  color: var(--text-muted, #b0b0b0);
 }
 
 .error-message {
-  color: #ff4444;
-  background-color: #ffebee;
+  color: var(--error-light, #ff6b6b);
+  background-color: rgba(231, 76, 60, 0.15);
   border-radius: 8px;
   padding: 1rem;
+  border: 1px solid var(--error-color, #e74c3c);
 }
 
 .empty-state p {
@@ -99,41 +100,7 @@
 
 .empty-state p:first-child {
   font-weight: 600;
-  color: #1a1a1a;
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .group-card {
-    background: #1a1a1a;
-    border-color: #444;
-  }
-  
-  .group-card:hover {
-    border-color: #646cff;
-    box-shadow: 0 2px 8px rgba(100, 108, 255, 0.2);
-  }
-  
-  .group-name {
-    color: rgba(255, 255, 255, 0.87);
-  }
-  
-  .group-description {
-    color: rgba(255, 255, 255, 0.6);
-  }
-  
-  .group-meta {
-    color: rgba(255, 255, 255, 0.5);
-  }
-  
-  .empty-state p:first-child {
-    color: rgba(255, 255, 255, 0.87);
-  }
-  
-  .error-message {
-    background-color: #3d1f1f;
-    color: #ff6b6b;
-  }
+  color: var(--text-secondary, #e8e8e8);
 }
 
 /* Tablet and desktop */

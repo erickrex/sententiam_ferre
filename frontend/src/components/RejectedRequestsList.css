@@ -10,20 +10,21 @@
 }
 
 .rejected-requests-list .empty-message {
-  color: #666;
+  color: var(--text-muted, #b0b0b0);
   font-style: italic;
 }
 
 .rejected-requests-list .request-card {
-  background: white;
-  border: 1px solid #e0e0e0;
+  background: var(--bg-card, #1e1e3f);
+  border: 1px solid var(--border-color, #4a4a6a);
   border-radius: 8px;
   padding: 1rem;
-  transition: box-shadow 0.2s;
+  transition: all 0.2s;
 }
 
 .rejected-requests-list .request-card:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md, 0 4px 15px rgba(0, 0, 0, 0.4));
+  border-color: var(--accent-primary, #6c5ce7);
 }
 
 .rejected-requests-list .request-header {
@@ -37,7 +38,7 @@
   margin: 0;
   font-size: 1.1rem;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary, #fff);
 }
 
 .rejected-requests-list .request-info {
@@ -45,7 +46,7 @@
 }
 
 .rejected-requests-list .request-date {
-  color: #666;
+  color: var(--text-muted, #b0b0b0);
   font-size: 0.9rem;
 }
 
@@ -64,12 +65,13 @@
   cursor: pointer;
   transition: all 0.2s;
   min-height: 44px;
-  background-color: #f44336;
+  background: var(--error-gradient, linear-gradient(135deg, #e74c3c 0%, #ff6b6b 100%));
   color: white;
 }
 
 .rejected-requests-list .delete-button:hover:not(:disabled) {
-  background-color: #da190b;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
 }
 
 .rejected-requests-list .delete-button:disabled {
@@ -83,7 +85,7 @@
 
 .rejected-requests-list .confirm-message {
   margin: 0 0 0.75rem 0;
-  color: #333;
+  color: var(--text-secondary, #e8e8e8);
   font-size: 0.9rem;
 }
 
@@ -106,21 +108,23 @@
 }
 
 .rejected-requests-list .cancel-button {
-  background-color: #e0e0e0;
-  color: #333;
+  background-color: var(--bg-tertiary, #0f0f23);
+  color: var(--text-secondary, #e8e8e8);
+  border: 1px solid var(--border-color, #4a4a6a);
 }
 
 .rejected-requests-list .cancel-button:hover:not(:disabled) {
-  background-color: #d0d0d0;
+  background-color: var(--bg-hover, #252550);
 }
 
 .rejected-requests-list .confirm-delete-button {
-  background-color: #f44336;
+  background: var(--error-gradient, linear-gradient(135deg, #e74c3c 0%, #ff6b6b 100%));
   color: white;
 }
 
 .rejected-requests-list .confirm-delete-button:hover:not(:disabled) {
-  background-color: #da190b;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
 }
 
 .rejected-requests-list .cancel-button:disabled,

@@ -29,15 +29,15 @@
 }
 
 .message-bubble.current-user .message-content {
-  background-color: #007bff;
+  background: var(--accent-gradient, linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%));
   color: white;
   border-radius: 18px 18px 4px 18px;
   padding: 0.75rem 1rem;
 }
 
 .message-bubble.other-user .message-content {
-  background-color: #f1f3f5;
-  color: #333;
+  background-color: var(--bg-tertiary, #0f0f23);
+  color: var(--text-secondary, #e8e8e8);
   border-radius: 18px 18px 18px 4px;
   padding: 0.75rem 1rem;
 }
@@ -46,7 +46,7 @@
   font-size: 0.75rem;
   font-weight: 600;
   margin-bottom: 0.25rem;
-  color: #007bff;
+  color: var(--accent-secondary, #a29bfe);
 }
 
 .message-text {
@@ -70,7 +70,7 @@
 }
 
 .message-bubble.other-user .message-meta {
-  color: #999;
+  color: var(--text-muted, #b0b0b0);
 }
 
 .message-time {

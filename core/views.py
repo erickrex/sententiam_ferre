@@ -1493,9 +1493,23 @@ class DecisionViewSet(viewsets.ModelViewSet):
         
         if request.method == 'GET':
             # List items for this decision
+            # By default, only show published items (exclude drafts)
+            # Use ?include_drafts=true to include user's own drafts
+            include_drafts = request.query_params.get('include_drafts', 'false').lower() == 'true'
+            
             items = DecisionItem.objects.filter(decision=decision).select_related(
-                'decision', 'catalog_item'
+                'decision', 'catalog_item', 'created_by'
             ).prefetch_related('item_terms__term__taxonomy')
+            
+            if include_drafts:
+                # Show published items + user's own drafts
+                from django.db.models import Q
+                items = items.filter(
+                    Q(status='published') | Q(status='draft', created_by=request.user)
+                )
+            else:
+                # Only show published items
+                items = items.filter(status='published')
             
             # Apply tag filters
             tag_ids = request.query_params.getlist('tag')
@@ -2206,21 +2220,24 @@ class DecisionItemViewSet(viewsets.ModelViewSet):
         """
         Delete item
         DELETE /api/v1/items/:id
+        
+        Only group admins can delete items.
         """
         try:
             item = self.get_queryset().get(pk=pk)
             
-            # Check if user is a confirmed member of the decision's group
+            # Check if user is an admin of the decision's group
             membership = GroupMembership.objects.filter(
                 group=item.decision.group,
                 user=request.user,
-                is_confirmed=True
+                is_confirmed=True,
+                role='admin'
             ).first()
             
             if not membership:
                 return Response({
                     'status': 'error',
-                    'message': 'You do not have permission to delete this item'
+                    'message': 'Only group admins can delete items'
                 }, status=status.HTTP_403_FORBIDDEN)
             
             item.delete()
@@ -3139,10 +3156,15 @@ class GenerationViewSet(viewsets.GenericViewSet):
         parent_version = parent_item.get_version()
         new_version = parent_version + 1
         
-        # Create the new DecisionItem as a variation
+        # Check if user wants to create as draft (default: True for variations)
+        create_as_draft = request.data.get('as_draft', True)
+        
+        # Create the new DecisionItem as a variation (draft by default)
         variation_item = DecisionItem.objects.create(
             decision=decision,
             label=variation_params['description'][:255],
+            status='draft' if create_as_draft else 'published',
+            created_by=request.user,
             attributes={
                 'type': '2d_character',
                 'description': variation_params['description'],
@@ -3167,13 +3189,18 @@ class GenerationViewSet(viewsets.GenericViewSet):
             
             job_serializer = GenerationJobSerializer(job)
             
+            from core.serializers import DecisionItemSerializer
+            item_serializer = DecisionItemSerializer(variation_item)
+            
             return Response({
                 'status': 'success',
-                'message': 'Character variation generation started',
+                'message': 'Character variation generation started' + (' (draft)' if create_as_draft else ''),
                 'data': {
                     'job': job_serializer.data,
+                    'item': item_serializer.data,
                     'parent_item_id': str(parent_item.id),
                     'version': new_version,
+                    'is_draft': create_as_draft,
                     'param_changes': {
                         k: v for k, v in variation_params.items()
                         if k != 'description' and v != parent_params.get(k)
@@ -3331,6 +3358,244 @@ class GenerationViewSet(viewsets.GenericViewSet):
                 'item_description': item_description,
             }
         }, status=status.HTTP_200_OK)
+    
+    @action(detail=False, methods=['get'], url_path='my-drafts')
+    def my_drafts(self, request):
+        """
+        Get all draft items created by the current user
+        GET /api/v1/generations/my-drafts/
+        
+        Returns draft variations that the user can preview, regenerate, or publish.
+        """
+        from core.serializers import DecisionItemSerializer
+        
+        drafts = DecisionItem.objects.filter(
+            created_by=request.user,
+            status='draft'
+        ).select_related('decision', 'decision__group').order_by('-created_at')
+        
+        serializer = DecisionItemSerializer(drafts, many=True)
+        
+        return Response({
+            'status': 'success',
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+    
+    @action(detail=False, methods=['post'], url_path='items/(?P<item_id>[^/.]+)/publish')
+    def publish_item(self, request, item_id=None):
+        """
+        Publish a draft item so it becomes visible and votable by the group
+        POST /api/v1/generations/items/:item_id/publish/
+        
+        Only the creator of a draft can publish it.
+        """
+        from core.serializers import DecisionItemSerializer
+        
+        try:
+            item = DecisionItem.objects.select_related('decision', 'decision__group', 'created_by').get(pk=item_id)
+        except DecisionItem.DoesNotExist:
+            return Response({
+                'status': 'error',
+                'message': 'Item not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        # Check if user is the creator
+        if item.created_by != request.user:
+            return Response({
+                'status': 'error',
+                'message': 'Only the creator can publish this item'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        # Check if it's a draft
+        if item.status != 'draft':
+            return Response({
+                'status': 'error',
+                'message': 'Item is already published'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if generation is complete (has image_url)
+        image_url = item.attributes.get('image_url') if item.attributes else None
+        if not image_url:
+            return Response({
+                'status': 'error',
+                'message': 'Cannot publish item without a generated image. Wait for generation to complete.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Publish the item
+        item.publish()
+        
+        serializer = DecisionItemSerializer(item)
+        
+        return Response({
+            'status': 'success',
+            'message': 'Item published successfully. It is now visible to all group members.',
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+    
+    @action(detail=False, methods=['delete'], url_path='items/(?P<item_id>[^/.]+)/discard')
+    def discard_draft(self, request, item_id=None):
+        """
+        Discard (delete) a draft item
+        DELETE /api/v1/generations/items/:item_id/discard/
+        
+        Only the creator of a draft can discard it.
+        """
+        try:
+            item = DecisionItem.objects.select_related('created_by').get(pk=item_id)
+        except DecisionItem.DoesNotExist:
+            return Response({
+                'status': 'error',
+                'message': 'Item not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        # Check if user is the creator
+        if item.created_by != request.user:
+            return Response({
+                'status': 'error',
+                'message': 'Only the creator can discard this item'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        # Check if it's a draft
+        if item.status != 'draft':
+            return Response({
+                'status': 'error',
+                'message': 'Cannot discard a published item'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        item_label = item.label
+        item.delete()
+        
+        return Response({
+            'status': 'success',
+            'message': f'Draft "{item_label}" discarded successfully'
+        }, status=status.HTTP_200_OK)
+    
+    @action(detail=False, methods=['post'], url_path='items/(?P<item_id>[^/.]+)/regenerate')
+    def regenerate_draft(self, request, item_id=None):
+        """
+        Regenerate a draft item with new parameters
+        POST /api/v1/generations/items/:item_id/regenerate/
+        
+        Deletes the current draft and creates a new one with updated parameters.
+        Only the creator of a draft can regenerate it.
+        
+        Request body (all fields optional - will use current values if not provided):
+        {
+            "description": "friendly robot sidekick with wings",
+            "art_style": "cartoon",
+            "view_angle": "side_profile",
+            "pose": "jumping",
+            "expression": "happy",
+            "background": "transparent",
+            "color_palette": "vibrant"
+        }
+        """
+        from core.models import GenerationJob
+        from core.serializers import GenerationJobSerializer, VariationRequestSerializer, DecisionItemSerializer
+        from core.services.generation import GenerationJobProcessor, GenerationJobProcessorError
+        
+        try:
+            item = DecisionItem.objects.select_related('decision', 'decision__group', 'created_by').get(pk=item_id)
+        except DecisionItem.DoesNotExist:
+            return Response({
+                'status': 'error',
+                'message': 'Item not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        # Check if user is the creator
+        if item.created_by != request.user:
+            return Response({
+                'status': 'error',
+                'message': 'Only the creator can regenerate this item'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        # Check if it's a draft
+        if item.status != 'draft':
+            return Response({
+                'status': 'error',
+                'message': 'Cannot regenerate a published item. Create a new variation instead.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        decision = item.decision
+        
+        # Get current generation parameters
+        current_params = item.get_generation_params()
+        current_description = item.attributes.get('description', item.label) if item.attributes else item.label
+        
+        # Validate request parameters
+        serializer = VariationRequestSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response({
+                'status': 'error',
+                'message': 'Invalid parameters',
+                'errors': serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Merge current params with provided params
+        new_params = {
+            'description': serializer.validated_data.get('description') or current_description,
+            'art_style': serializer.validated_data.get('art_style') or current_params.get('art_style', 'cartoon'),
+            'view_angle': serializer.validated_data.get('view_angle') or current_params.get('view_angle', 'side_profile'),
+            'pose': serializer.validated_data.get('pose') or current_params.get('pose', 'idle'),
+            'expression': serializer.validated_data.get('expression') or current_params.get('expression', 'neutral'),
+            'background': serializer.validated_data.get('background') or current_params.get('background', 'transparent'),
+            'color_palette': serializer.validated_data.get('color_palette') or current_params.get('color_palette', 'vibrant'),
+        }
+        
+        # Validate and apply locked parameters
+        locked_params = decision.get_locked_params()
+        if locked_params:
+            for param_name, locked_value in locked_params.items():
+                provided_value = serializer.validated_data.get(param_name)
+                if provided_value is not None and provided_value != locked_value:
+                    return Response({
+                        'status': 'error',
+                        'message': f'Parameter "{param_name}" is locked to "{locked_value}" for this decision.'
+                    }, status=status.HTTP_400_BAD_REQUEST)
+                new_params[param_name] = locked_value
+        
+        # Update the item's attributes
+        item.label = new_params['description'][:255]
+        item.attributes = {
+            **item.attributes,
+            'description': new_params['description'],
+            'generation_params': {
+                'art_style': new_params['art_style'],
+                'view_angle': new_params['view_angle'],
+                'pose': new_params['pose'],
+                'expression': new_params['expression'],
+                'background': new_params['background'],
+                'color_palette': new_params['color_palette'],
+            },
+            'image_url': None,  # Clear old image
+        }
+        item.save()
+        
+        # Delete old generation jobs for this item
+        GenerationJob.objects.filter(item=item).delete()
+        
+        # Create new generation job
+        try:
+            processor = GenerationJobProcessor()
+            job = processor.create_job(item=item, parameters=new_params)
+            
+            job_serializer = GenerationJobSerializer(job)
+            item_serializer = DecisionItemSerializer(item)
+            
+            return Response({
+                'status': 'success',
+                'message': 'Regeneration started',
+                'data': {
+                    'job': job_serializer.data,
+                    'item': item_serializer.data,
+                }
+            }, status=status.HTTP_200_OK)
+            
+        except GenerationJobProcessorError as e:
+            return Response({
+                'status': 'error',
+                'message': f'Failed to start regeneration: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class ExportViewSet(viewsets.GenericViewSet):

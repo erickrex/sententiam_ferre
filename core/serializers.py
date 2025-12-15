@@ -512,14 +512,20 @@ class DecisionItemSerializer(serializers.ModelSerializer):
     """Serializer for DecisionItem model with nested attribute handling"""
     catalog_item_label = serializers.CharField(source='catalog_item.label', read_only=True)
     tags = DecisionItemTermSerializer(source='item_terms', many=True, read_only=True)
+    created_by_username = serializers.CharField(source='created_by.username', read_only=True)
+    is_draft = serializers.SerializerMethodField()
     
     class Meta:
         model = DecisionItem
         fields = [
             'id', 'decision', 'catalog_item', 'catalog_item_label', 
-            'label', 'attributes', 'external_ref', 'created_at', 'tags'
+            'label', 'attributes', 'external_ref', 'status', 'created_by',
+            'created_by_username', 'is_draft', 'created_at', 'tags'
         ]
-        read_only_fields = ['id', 'created_at']
+        read_only_fields = ['id', 'created_at', 'created_by_username', 'is_draft']
+    
+    def get_is_draft(self, obj):
+        return obj.status == 'draft'
     
     def validate_attributes(self, value):
         """Validate attributes is a valid JSON object if provided"""

@@ -25,7 +25,7 @@
 }
 
 .auth-header p {
-  color: #666;
+  color: var(--text-muted, #b0b0b0);
   font-size: 0.95rem;
   margin: 0;
 }
@@ -34,7 +34,7 @@
   text-align: center;
   margin-top: 1.5rem;
   padding-top: 1.5rem;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--border-color, #4a4a6a);
 }
 
 .auth-footer p {
@@ -43,7 +43,7 @@
 }
 
 .auth-link {
-  color: #646cff;
+  color: var(--accent-secondary, #a29bfe);
   text-decoration: none;
   font-weight: 600;
 }
@@ -52,16 +52,7 @@
   text-decoration: underline;
 }
 
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .auth-header p {
-    color: #aaa;
-  }
-  
-  .auth-footer {
-    border-top-color: #444;
-  }
-}
+/* Dark mode support - already using dark theme */
 
 /* Tablet and desktop */
 @media (min-width: 768px) {

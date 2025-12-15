@@ -1,6 +1,6 @@
 .invite-user-form {
-  background: var(--card-background, #fff);
-  border: 1px solid var(--border-color, #e0e0e0);
+  background: var(--bg-secondary, #16213e);
+  border: 1px solid var(--border-color, #4a4a6a);
   border-radius: 8px;
   padding: 1.5rem;
   margin-bottom: 2rem;
@@ -13,19 +13,19 @@
 
 .invite-user-form .empty-message {
   font-size: 1rem;
-  color: var(--text-primary, #1a1a1a);
+  color: var(--text-primary, #fff);
   margin: 0 0 0.5rem 0;
 }
 
 .invite-user-form .empty-hint {
   font-size: 0.9rem;
-  color: var(--text-secondary, #666);
+  color: var(--text-secondary, #e8e8e8);
   margin: 0;
 }
 
 .invite-user-form .loading-text {
   text-align: center;
-  color: var(--text-secondary, #666);
+  color: var(--text-secondary, #e8e8e8);
   margin: 0;
 }
 
@@ -44,49 +44,53 @@
 .invite-user-form label {
   font-size: 0.9rem;
   font-weight: 500;
-  color: var(--text-primary, #1a1a1a);
+  color: var(--text-secondary, #e8e8e8);
 }
 
 .invite-user-form .form-select,
 .invite-user-form .form-input {
   padding: 0.75rem;
-  border: 1px solid var(--border-color, #e0e0e0);
+  border: 1px solid var(--border-color, #4a4a6a);
   border-radius: 6px;
   font-size: 1rem;
   font-family: inherit;
   transition: border-color 0.2s;
+  background-color: var(--bg-tertiary, #0f0f23);
+  color: var(--text-primary, #fff);
 }
 
 .invite-user-form .form-select:focus,
 .invite-user-form .form-input:focus {
   outline: none;
-  border-color: var(--primary-color, #007bff);
+  border-color: var(--accent-primary, #6c5ce7);
 }
 
 .invite-user-form .form-select:disabled,
 .invite-user-form .form-input:disabled {
-  background-color: var(--disabled-background, #f5f5f5);
+  background-color: var(--bg-tertiary, #0f0f23);
   cursor: not-allowed;
+  opacity: 0.6;
 }
 
 .invite-user-form .submit-button {
   padding: 0.75rem 1.5rem;
-  background-color: var(--primary-color, #007bff);
+  background: var(--accent-gradient, linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%));
   color: white;
   border: none;
   border-radius: 6px;
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
 }
 
 .invite-user-form .submit-button:hover:not(:disabled) {
-  background-color: var(--primary-hover, #0056b3);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(108, 92, 231, 0.5);
 }
 
 .invite-user-form .submit-button:disabled {
-  background-color: var(--disabled-background, #ccc);
+  opacity: 0.6;
   cursor: not-allowed;
 }
 

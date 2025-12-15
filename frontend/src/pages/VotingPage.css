@@ -1,6 +1,6 @@
 .voting-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: var(--bg-primary, #1a1a2e);
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -15,23 +15,25 @@
 
 .back-button {
   padding: 8px 16px;
-  background: white;
-  border: 1px solid #ddd;
+  background: var(--bg-secondary, #16213e);
+  border: 1px solid var(--border-color, #4a4a6a);
   border-radius: 8px;
   cursor: pointer;
   font-size: 1rem;
+  color: var(--text-secondary, #e8e8e8);
   transition: all 0.2s;
 }
 
 .back-button:hover {
-  background: #f5f5f5;
+  background: var(--bg-hover, #252550);
+  border-color: var(--accent-primary, #6c5ce7);
   transform: translateX(-2px);
 }
 
 .voting-header h1 {
   margin: 0;
   font-size: 1.8rem;
-  color: #333;
+  color: var(--text-primary, #fff);
 }
 
 .progress-section {
@@ -41,7 +43,7 @@
 .progress-bar {
   width: 100%;
   height: 8px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--bg-tertiary, #0f0f23);
   border-radius: 4px;
   overflow: hidden;
   margin-bottom: 8px;
@@ -49,20 +51,20 @@
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  background: var(--accent-gradient, linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%));
   transition: width 0.3s ease-out;
 }
 
 .progress-text {
   text-align: center;
   font-size: 0.95rem;
-  color: #666;
+  color: var(--text-muted, #b0b0b0);
   font-weight: 500;
 }
 
 .pending-indicator {
   margin-left: 8px;
-  color: #ff9800;
+  color: var(--warning-color, #f39c12);
   font-size: 0.85rem;
 }
 
@@ -85,13 +87,12 @@
   border-radius: 50%;
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  background: white;
+  box-shadow: var(--shadow-md, 0 4px 15px rgba(0, 0, 0, 0.4));
 }
 
 .vote-button:hover {
   transform: scale(1.1);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-lg, 0 8px 30px rgba(0, 0, 0, 0.5));
 }
 
 .vote-button:active {
@@ -99,18 +100,18 @@
 }
 
 .vote-button-dislike {
-  background: #f44336;
+  background: var(--error-gradient, linear-gradient(135deg, #e74c3c 0%, #ff6b6b 100%));
   color: white;
 }
 
 .vote-button-like {
-  background: #4caf50;
+  background: var(--success-gradient, linear-gradient(135deg, #00b894 0%, #55efc4 100%));
   color: white;
 }
 
 .vote-button-rating {
-  background: #ff9800;
-  color: white;
+  background: linear-gradient(135deg, var(--warning-color, #f39c12) 0%, var(--warning-light, #ffeaa7) 100%);
+  color: #000;
 }
 
 .button-icon {
@@ -130,7 +131,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.7);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -138,18 +139,19 @@
 }
 
 .rating-content {
-  background: white;
+  background: var(--bg-secondary, #16213e);
   padding: 30px;
   border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-lg, 0 8px 30px rgba(0, 0, 0, 0.5));
   max-width: 400px;
   width: 90%;
+  border: 1px solid var(--border-color, #4a4a6a);
 }
 
 .rating-content h3 {
   margin: 0 0 20px 0;
   text-align: center;
-  color: #333;
+  color: var(--text-primary, #fff);
 }
 
 .rating-stars {
@@ -164,7 +166,7 @@
   border: none;
   font-size: 3rem;
   cursor: pointer;
-  color: #ddd;
+  color: var(--border-light, #5a5a7a);
   transition: all 0.2s;
   padding: 0;
   line-height: 1;
@@ -175,7 +177,7 @@
 }
 
 .star-active {
-  color: #ff9800;
+  color: var(--warning-color, #f39c12);
 }
 
 .rating-actions {
@@ -196,21 +198,25 @@
 }
 
 .rating-cancel {
-  background: #f5f5f5;
-  color: #666;
+  background: var(--bg-tertiary, #0f0f23);
+  color: var(--text-secondary, #e8e8e8);
+  border: 1px solid var(--border-color, #4a4a6a);
 }
 
 .rating-cancel:hover {
-  background: #e0e0e0;
+  background: var(--error-gradient, linear-gradient(135deg, #e74c3c 0%, #ff6b6b 100%));
+  color: white;
+  border-color: transparent;
 }
 
 .rating-submit {
-  background: #667eea;
+  background: var(--accent-gradient, linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%));
   color: white;
 }
 
 .rating-submit:hover {
-  background: #5568d3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);
 }
 
 .undo-button {
@@ -219,21 +225,22 @@
   left: 50%;
   transform: translateX(-50%);
   padding: 12px 24px;
-  background: white;
-  border: 2px solid #667eea;
+  background: var(--bg-secondary, #16213e);
+  border: 2px solid var(--accent-primary, #6c5ce7);
   border-radius: 24px;
   cursor: pointer;
   font-size: 1rem;
   font-weight: 600;
-  color: #667eea;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  color: var(--accent-secondary, #a29bfe);
+  box-shadow: var(--shadow-md, 0 4px 15px rgba(0, 0, 0, 0.4));
   transition: all 0.2s;
   z-index: 100;
 }
 
 .undo-button:hover {
-  background: #667eea;
+  background: var(--accent-gradient, linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%));
   color: white;
+  border-color: transparent;
   transform: translateX(-50%) scale(1.05);
 }
 
@@ -241,21 +248,22 @@
 .error-message {
   text-align: center;
   padding: 60px 20px;
+  color: var(--text-muted, #b0b0b0);
 }
 
 .error-message h2 {
-  color: #f44336;
+  color: var(--error-light, #ff6b6b);
   margin-bottom: 12px;
 }
 
 .error-message p {
-  color: #666;
+  color: var(--text-muted, #b0b0b0);
   margin-bottom: 20px;
 }
 
 .error-message button {
   padding: 12px 24px;
-  background: #667eea;
+  background: var(--accent-gradient, linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%));
   color: white;
   border: none;
   border-radius: 8px;
@@ -265,7 +273,8 @@
 }
 
 .error-message button:hover {
-  background: #5568d3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);
 }
 
 /* Mobile responsiveness */

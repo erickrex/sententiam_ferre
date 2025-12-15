@@ -5,8 +5,8 @@
 }
 
 .skeleton-card {
-  background: white;
-  border: 1px solid #e0e0e0;
+  background: var(--bg-card, #1e1e3f);
+  border: 1px solid var(--border-color, #4a4a6a);
   border-radius: 8px;
   padding: 16px;
   display: flex;
@@ -23,7 +23,7 @@
 
 .skeleton-title {
   height: 20px;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background: linear-gradient(90deg, var(--bg-secondary, #16213e) 25%, var(--bg-hover, #252550) 50%, var(--bg-secondary, #16213e) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
   border-radius: 4px;
@@ -34,7 +34,7 @@
 .skeleton-badge {
   height: 24px;
   width: 80px;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background: linear-gradient(90deg, var(--bg-secondary, #16213e) 25%, var(--bg-hover, #252550) 50%, var(--bg-secondary, #16213e) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
   border-radius: 12px;
@@ -48,7 +48,7 @@
 
 .skeleton-text {
   height: 16px;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background: linear-gradient(90deg, var(--bg-secondary, #16213e) 25%, var(--bg-hover, #252550) 50%, var(--bg-secondary, #16213e) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
   border-radius: 4px;
@@ -64,7 +64,7 @@
 .skeleton-button {
   height: 36px;
   width: 100px;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background: linear-gradient(90deg, var(--bg-secondary, #16213e) 25%, var(--bg-hover, #252550) 50%, var(--bg-secondary, #16213e) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
   border-radius: 6px;
@@ -72,8 +72,8 @@
 
 .skeleton-list-item {
   height: 60px;
-  background: white;
-  border: 1px solid #e0e0e0;
+  background: var(--bg-card, #1e1e3f);
+  border: 1px solid var(--border-color, #4a4a6a);
   border-radius: 8px;
   padding: 16px;
   display: flex;

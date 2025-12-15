@@ -180,9 +180,9 @@ export const generationAPI = {
   listDecisionJobs: (decisionId, params = {}) => 
     api.get(`/generations/decisions/${decisionId}/jobs/`, { params }),
   
-  // Create a variation of an existing character
-  createVariation: (itemId, variationData) => 
-    api.post(`/generations/items/${itemId}/variation/`, variationData),
+  // Create a variation of an existing character (as draft by default)
+  createVariation: (itemId, variationData, asDraft = true) => 
+    api.post(`/generations/items/${itemId}/variation/`, { ...variationData, as_draft: asDraft }),
   
   // Get version information for a character item
   getItemVersions: (itemId) => 
@@ -191,6 +191,22 @@ export const generationAPI = {
   // Timeout a stale generation job and delete the associated item
   timeoutJob: (jobId) => 
     api.post(`/generations/jobs/${jobId}/timeout/`),
+  
+  // Get user's draft variations
+  getMyDrafts: () => 
+    api.get('/generations/my-drafts/'),
+  
+  // Publish a draft item to make it visible to the group
+  publishItem: (itemId) => 
+    api.post(`/generations/items/${itemId}/publish/`),
+  
+  // Discard (delete) a draft item
+  discardDraft: (itemId) => 
+    api.delete(`/generations/items/${itemId}/discard/`),
+  
+  // Regenerate a draft with new parameters
+  regenerateDraft: (itemId, parameters) => 
+    api.post(`/generations/items/${itemId}/regenerate/`, parameters),
 };
 
 // Export API (character image and parameter exports)

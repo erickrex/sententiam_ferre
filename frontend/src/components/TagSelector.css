@@ -1,7 +1,7 @@
 .tag-selector {
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-color, #4a4a6a);
   border-radius: 4px;
-  background-color: white;
+  background-color: var(--bg-secondary, #16213e);
   max-height: 400px;
   overflow-y: auto;
 }
@@ -9,12 +9,12 @@
 .tag-selector-empty {
   padding: 1rem;
   text-align: center;
-  color: #666;
+  color: var(--text-muted, #b0b0b0);
   font-size: 0.9rem;
 }
 
 .taxonomy-section {
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--border-color, #4a4a6a);
 }
 
 .taxonomy-section:last-child {
@@ -27,7 +27,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem 1rem;
-  background-color: #f5f5f5;
+  background-color: var(--bg-tertiary, #0f0f23);
   border: none;
   cursor: pointer;
   transition: background-color 0.2s;
@@ -36,7 +36,7 @@
 }
 
 .taxonomy-header:hover:not(:disabled) {
-  background-color: #e8e8e8;
+  background-color: var(--bg-hover, #252550);
 }
 
 .taxonomy-header:disabled {
@@ -46,24 +46,24 @@
 
 .taxonomy-name {
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary, #fff);
   font-size: 0.95rem;
   text-transform: capitalize;
 }
 
 .taxonomy-toggle {
-  color: #666;
+  color: var(--text-muted, #b0b0b0);
   font-size: 0.85rem;
 }
 
 .terms-list {
   padding: 0.5rem;
-  background-color: white;
+  background-color: var(--bg-secondary, #16213e);
 }
 
 .terms-empty {
   padding: 0.75rem 1rem;
-  color: #999;
+  color: var(--text-muted, #b0b0b0);
   font-size: 0.85rem;
   font-style: italic;
 }
@@ -80,7 +80,7 @@
 }
 
 .term-checkbox-label:hover:not(.disabled) {
-  background-color: #f5f5f5;
+  background-color: var(--bg-hover, #252550);
 }
 
 .term-checkbox-label.disabled {
@@ -102,14 +102,14 @@
 .term-value {
   flex: 1;
   font-size: 0.9rem;
-  color: #333;
+  color: var(--text-secondary, #e8e8e8);
 }
 
 .term-color-indicator {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  border: 2px solid #ddd;
+  border: 2px solid var(--border-color, #4a4a6a);
   flex-shrink: 0;
 }
 
@@ -118,18 +118,18 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem 1rem;
-  background-color: #e3f2fd;
-  border-top: 1px solid #90caf9;
+  background-color: rgba(108, 92, 231, 0.15);
+  border-top: 1px solid var(--accent-primary, #6c5ce7);
   font-size: 0.9rem;
 }
 
 .summary-label {
   font-weight: 600;
-  color: #1976d2;
+  color: var(--accent-secondary, #a29bfe);
 }
 
 .summary-count {
-  color: #1565c0;
+  color: var(--accent-primary, #6c5ce7);
   font-weight: 600;
 }
 

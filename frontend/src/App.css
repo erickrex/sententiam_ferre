@@ -5,6 +5,7 @@
   flex-direction: column;
   width: 100%;
   overflow-x: hidden;
+  background-color: var(--bg-primary, #1a1a2e);
 }
 
 .main-content {

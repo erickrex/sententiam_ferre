@@ -16,40 +16,28 @@
   margin: 0 0 0.5rem 0;
   font-size: 1.5rem;
   font-weight: 700;
-  color: #1a1a1a;
+  color: var(--text-primary, #ffffff);
 }
 
 .section-description {
   margin: 0 0 1.5rem 0;
   font-size: 0.95rem;
-  color: #6b7280;
+  color: var(--text-muted, #b0b0b0);
 }
 
 .subsection-title {
   margin: 2rem 0 1rem 0;
   font-size: 1.2rem;
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--text-secondary, #e8e8e8);
 }
 
 .loading-message {
-  color: #6b7280;
+  color: var(--text-muted, #b0b0b0);
   font-size: 0.95rem;
   text-align: center;
   padding: 2rem;
   margin: 0;
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .section-title,
-  .subsection-title {
-    color: rgba(255, 255, 255, 0.87);
-  }
-
-  .loading-message {
-    color: #9ca3af;
-  }
 }
 
 /* Tablet and desktop */

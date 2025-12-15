@@ -12,19 +12,12 @@
   margin: 0;
   font-size: 2rem;
   font-weight: 700;
-  color: #1a1a1a;
+  color: var(--text-primary, #ffffff);
 }
 
 .join-tab,
 .create-tab {
   width: 100%;
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .page-title {
-    color: rgba(255, 255, 255, 0.87);
-  }
 }
 
 /* Tablet and desktop */

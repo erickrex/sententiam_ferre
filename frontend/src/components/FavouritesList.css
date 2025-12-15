@@ -9,15 +9,15 @@
 }
 
 .favourites-list-loading {
-  color: #666;
+  color: var(--text-muted, #b0b0b0);
 }
 
 .spinner {
   width: 40px;
   height: 40px;
   margin: 0 auto 1rem;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #007bff;
+  border: 4px solid var(--border-color, #4a4a6a);
+  border-top: 4px solid var(--accent-primary, #6c5ce7);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -28,11 +28,11 @@
 }
 
 .favourites-list-error {
-  color: #dc3545;
+  color: var(--error-light, #ff6b6b);
 }
 
 .retry-button {
-  background-color: #007bff;
+  background: var(--accent-gradient, linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%));
   color: white;
   padding: 0.5rem 1rem;
   border: none;
@@ -44,8 +44,8 @@
 }
 
 .retry-button:hover {
-  background-color: #0056b3;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);
 }
 
 .favourites-controls {
@@ -55,8 +55,9 @@
   align-items: center;
   margin-bottom: 1.5rem;
   padding: 1rem;
-  background-color: #f8f9fa;
+  background-color: var(--bg-secondary, #16213e);
   border-radius: 8px;
+  border: 1px solid var(--border-color, #4a4a6a);
 }
 
 .control-group {
@@ -68,25 +69,25 @@
 .control-group label {
   font-size: 0.9rem;
   font-weight: 500;
-  color: #333;
+  color: var(--text-secondary, #e8e8e8);
   white-space: nowrap;
 }
 
 .sort-select,
 .filter-input {
   padding: 0.5rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-color, #4a4a6a);
   border-radius: 6px;
   font-size: 0.9rem;
-  background-color: white;
+  background-color: var(--bg-tertiary, #0f0f23);
+  color: var(--text-primary, #fff);
   cursor: pointer;
 }
 
 .sort-select:focus,
 .filter-input:focus {
   outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+  border-color: var(--accent-primary, #6c5ce7);
 }
 
 .filter-input {
@@ -94,7 +95,7 @@
 }
 
 .refresh-button {
-  background-color: #28a745;
+  background: var(--success-gradient, linear-gradient(135deg, #00b894 0%, #55efc4 100%));
   color: white;
   padding: 0.5rem 1rem;
   border: none;
@@ -106,14 +107,14 @@
 }
 
 .refresh-button:hover {
-  background-color: #218838;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 184, 148, 0.4);
 }
 
 .favourites-empty {
   text-align: center;
   padding: 3rem 1rem;
-  color: #666;
+  color: var(--text-muted, #b0b0b0);
 }
 
 .favourites-empty p {
@@ -133,16 +134,17 @@
   justify-content: center;
   margin-top: 1.5rem;
   padding: 0.75rem;
-  background-color: #e7f5ff;
+  background-color: rgba(108, 92, 231, 0.15);
+  border: 1px solid var(--accent-primary, #6c5ce7);
   border-radius: 6px;
   font-size: 0.875rem;
-  color: #0066cc;
+  color: var(--accent-secondary, #a29bfe);
 }
 
 .refresh-dot {
   width: 8px;
   height: 8px;
-  background-color: #28a745;
+  background-color: var(--success-color, #00b894);
   border-radius: 50%;
   animation: pulse 2s ease-in-out infinite;
 }
@@ -204,10 +206,10 @@
   gap: 0.75rem;
   padding: 0.75rem 1rem;
   margin-bottom: 1rem;
-  background-color: #fff3cd;
-  border: 1px solid #ffc107;
+  background-color: rgba(243, 156, 18, 0.15);
+  border: 1px solid var(--warning-color, #f39c12);
   border-radius: 6px;
-  color: #856404;
+  color: var(--warning-light, #ffeaa7);
 }
 
 .export-error-banner .error-icon {
@@ -223,7 +225,7 @@
   background: none;
   border: none;
   font-size: 1.25rem;
-  color: #856404;
+  color: var(--warning-light, #ffeaa7);
   cursor: pointer;
   padding: 0;
   line-height: 1;
@@ -241,7 +243,7 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  background-color: #6f42c1;
+  background: var(--accent-gradient, linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%));
   color: white;
   padding: 0.5rem 1rem;
   border: none;
@@ -252,8 +254,8 @@
 }
 
 .download-all-button:hover:not(:disabled) {
-  background-color: #5a32a3;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);
 }
 
 .download-all-button:disabled {
@@ -282,7 +284,7 @@
 }
 
 .favourite-item-wrapper.selected {
-  outline: 2px solid #4a90d9;
+  outline: 2px solid var(--accent-primary, #6c5ce7);
   outline-offset: 4px;
   border-radius: 12px;
 }

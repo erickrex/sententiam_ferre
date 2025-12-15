@@ -6,7 +6,7 @@
 .tabs-header {
   display: flex;
   gap: 0.5rem;
-  border-bottom: 2px solid #e5e7eb;
+  border-bottom: 2px solid var(--border-color, #4a4a6a);
   margin-bottom: 1.5rem;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
@@ -25,7 +25,7 @@
   background: none;
   border: none;
   border-bottom: 3px solid transparent;
-  color: #6b7280;
+  color: var(--text-muted, #b0b0b0);
   cursor: pointer;
   transition: all 0.2s;
   white-space: nowrap;
@@ -35,13 +35,13 @@
 }
 
 .tab-button:hover {
-  color: #374151;
-  background-color: rgba(100, 108, 255, 0.05);
+  color: var(--text-secondary, #e8e8e8);
+  background-color: var(--bg-hover, #252550);
 }
 
 .tab-button.active {
-  color: #646cff;
-  border-bottom-color: #646cff;
+  color: var(--accent-secondary, #a29bfe);
+  border-bottom-color: var(--accent-primary, #6c5ce7);
 }
 
 /* Tab badge for notifications */
@@ -54,8 +54,8 @@
   align-items: center;
   justify-content: center;
   margin-left: 6px;
-  background-color: #e74c3c;
-  color: white;
+  background-color: var(--error-color, #e74c3c);
+  color: var(--text-primary, #ffffff);
   font-size: 0.7rem;
   font-weight: bold;
   min-width: 18px;
@@ -65,7 +65,7 @@
 }
 
 .tab-button.active .tab-badge {
-  background-color: #c0392b;
+  background-color: var(--error-light, #ff6b6b);
 }
 
 .tabs-content {
@@ -84,27 +84,6 @@
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .tabs-header {
-    border-bottom-color: #374151;
-  }
-
-  .tab-button {
-    color: #9ca3af;
-  }
-
-  .tab-button:hover {
-    color: #d1d5db;
-    background-color: rgba(100, 108, 255, 0.1);
-  }
-
-  .tab-button.active {
-    color: #818cf8;
-    border-bottom-color: #818cf8;
   }
 }
 

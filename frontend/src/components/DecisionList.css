@@ -5,8 +5,8 @@
 }
 
 .decision-card {
-  background: white;
-  border: 1px solid #e0e0e0;
+  background: var(--bg-card, #1e1e3f);
+  border: 1px solid var(--border-color, #4a4a6a);
   border-radius: 8px;
   padding: 1.25rem;
   text-decoration: none;
@@ -16,9 +16,9 @@
 }
 
 .decision-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md, 0 4px 15px rgba(0, 0, 0, 0.4));
   transform: translateY(-2px);
-  border-color: #007bff;
+  border-color: var(--accent-primary, #6c5ce7);
 }
 
 .decision-card-header {
@@ -33,7 +33,7 @@
   margin: 0;
   font-size: 1.25rem;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary, #fff);
   flex: 1;
 }
 
@@ -47,28 +47,28 @@
 }
 
 .status-badge.status-draft {
-  background-color: #f0f0f0;
-  color: #666;
+  background-color: var(--bg-tertiary, #0f0f23);
+  color: var(--text-muted, #b0b0b0);
 }
 
 .status-badge.status-open {
-  background-color: #d4edda;
-  color: #155724;
+  background: var(--success-gradient, linear-gradient(135deg, #00b894 0%, #55efc4 100%));
+  color: white;
 }
 
 .status-badge.status-closed {
-  background-color: #d1ecf1;
-  color: #0c5460;
+  background: var(--accent-gradient, linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%));
+  color: white;
 }
 
 .status-badge.status-archived {
-  background-color: #e2d9f3;
-  color: #5a3d7a;
+  background-color: var(--border-light, #5a5a7a);
+  color: var(--text-secondary, #e8e8e8);
 }
 
 .decision-description {
   margin: 0 0 0.75rem 0;
-  color: #666;
+  color: var(--text-muted, #b0b0b0);
   font-size: 0.95rem;
   line-height: 1.5;
   display: -webkit-box;
@@ -82,7 +82,7 @@
   flex-wrap: wrap;
   gap: 1rem;
   font-size: 0.875rem;
-  color: #666;
+  color: var(--text-muted, #b0b0b0);
 }
 
 .meta-item {
@@ -93,13 +93,13 @@
 
 .meta-label {
   font-weight: 600;
-  color: #333;
+  color: var(--text-secondary, #e8e8e8);
 }
 
 .empty-state {
   text-align: center;
   padding: 3rem 1rem;
-  color: #666;
+  color: var(--text-muted, #b0b0b0);
 }
 
 .empty-state p {

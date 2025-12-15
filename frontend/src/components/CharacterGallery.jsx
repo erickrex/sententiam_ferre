@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { itemsAPI, generationAPI } from '../services/api';
 import CharacterCard from './CharacterCard';
+import VariationEditor from './VariationEditor';
 import Toast from './Toast';
 import './CharacterGallery.css';
 
@@ -18,10 +19,11 @@ const GENERATION_TIMEOUT_MS = 40000;
 function CharacterGallery({ 
   decisionId, 
   onCreateVariation,
-  onViewDetails,
   onNavigateToVersion,
+  onDeleteItem,
   refreshTrigger = 0,
-  pollInterval = 5000
+  pollInterval = 5000,
+  isAdmin = false,
 }) {
   const [items, setItems] = useState([]);
   const [generationJobs, setGenerationJobs] = useState({});
@@ -30,6 +32,13 @@ function CharacterGallery({
   const [stats, setStats] = useState({ pending: 0, completed: 0, failed: 0 });
   const [filter, setFilter] = useState('all'); // 'all', 'completed', 'pending', 'failed'
   const [toastMessage, setToastMessage] = useState(null);
+  
+  // Variation editor state
+  const [showVariationEditor, setShowVariationEditor] = useState(false);
+  const [selectedParentItem, setSelectedParentItem] = useState(null);
+  const [currentDraft, setCurrentDraft] = useState(null);
+  const [currentDraftJob, setCurrentDraftJob] = useState(null);
+  const [editorLoading, setEditorLoading] = useState(false);
   
   const pollIntervalRef = useRef(null);
   const isMountedRef = useRef(true);
@@ -243,6 +252,198 @@ function CharacterGallery({
     }
   };
 
+  // Open variation editor for a character
+  const handleOpenVariationEditor = useCallback((parentItem) => {
+    setSelectedParentItem(parentItem);
+    setCurrentDraft(null);
+    setCurrentDraftJob(null);
+    setShowVariationEditor(true);
+  }, []);
+
+  // Create a new draft variation
+  const handleCreateVariation = useCallback(async (parentItemId, parameters) => {
+    setEditorLoading(true);
+    try {
+      const response = await generationAPI.createVariation(parentItemId, parameters, true);
+      const data = response.data.data || response.data;
+      
+      setCurrentDraft(data.item);
+      setCurrentDraftJob(data.job);
+      
+      // Start polling for this draft's job
+      loadItems(true);
+      
+      setToastMessage({
+        type: 'info',
+        message: 'Generating preview...',
+      });
+    } catch (err) {
+      console.error('Failed to create variation:', err);
+      setToastMessage({
+        type: 'error',
+        message: err.response?.data?.message || 'Failed to create variation',
+      });
+    } finally {
+      setEditorLoading(false);
+    }
+  }, [loadItems]);
+
+  // Regenerate an existing draft
+  const handleRegenerateDraft = useCallback(async (draftItemId, parameters) => {
+    setEditorLoading(true);
+    try {
+      const response = await generationAPI.regenerateDraft(draftItemId, parameters);
+      const data = response.data.data || response.data;
+      
+      setCurrentDraft(data.item);
+      setCurrentDraftJob(data.job);
+      
+      loadItems(true);
+      
+      setToastMessage({
+        type: 'info',
+        message: 'Regenerating preview...',
+      });
+    } catch (err) {
+      console.error('Failed to regenerate draft:', err);
+      setToastMessage({
+        type: 'error',
+        message: err.response?.data?.message || 'Failed to regenerate',
+      });
+    } finally {
+      setEditorLoading(false);
+    }
+  }, [loadItems]);
+
+  // Publish a draft to make it visible to the group
+  const handlePublishDraft = useCallback(async (draftItemId) => {
+    setEditorLoading(true);
+    try {
+      await generationAPI.publishItem(draftItemId);
+      
+      setShowVariationEditor(false);
+      setSelectedParentItem(null);
+      setCurrentDraft(null);
+      setCurrentDraftJob(null);
+      
+      loadItems();
+      
+      setToastMessage({
+        type: 'success',
+        message: 'Variation published! It\'s now visible to your group.',
+      });
+    } catch (err) {
+      console.error('Failed to publish draft:', err);
+      setToastMessage({
+        type: 'error',
+        message: err.response?.data?.message || 'Failed to publish',
+      });
+    } finally {
+      setEditorLoading(false);
+    }
+  }, [loadItems]);
+
+  // Discard a draft
+  const handleDiscardDraft = useCallback(async (draftItemId) => {
+    setEditorLoading(true);
+    try {
+      await generationAPI.discardDraft(draftItemId);
+      
+      setShowVariationEditor(false);
+      setSelectedParentItem(null);
+      setCurrentDraft(null);
+      setCurrentDraftJob(null);
+      
+      loadItems(true);
+      
+      setToastMessage({
+        type: 'info',
+        message: 'Draft discarded',
+      });
+    } catch (err) {
+      console.error('Failed to discard draft:', err);
+      setToastMessage({
+        type: 'error',
+        message: err.response?.data?.message || 'Failed to discard draft',
+      });
+    } finally {
+      setEditorLoading(false);
+    }
+  }, [loadItems]);
+
+  // Close variation editor
+  const handleCloseVariationEditor = useCallback(() => {
+    setShowVariationEditor(false);
+    setSelectedParentItem(null);
+    setCurrentDraft(null);
+    setCurrentDraftJob(null);
+  }, []);
+
+  // Poll for current draft job status
+  useEffect(() => {
+    if (!currentDraftJob || !currentDraft) return;
+    if (currentDraftJob.status === 'completed' || currentDraftJob.status === 'failed') return;
+    
+    const pollDraftJob = async () => {
+      try {
+        const response = await generationAPI.getGenerationStatus(currentDraftJob.id);
+        const updatedJob = response.data.data || response.data;
+        
+        setCurrentDraftJob(updatedJob);
+        
+        if (updatedJob.status === 'completed' && updatedJob.image_url) {
+          // Update draft with image URL
+          setCurrentDraft(prev => ({
+            ...prev,
+            attributes: {
+              ...prev.attributes,
+              image_url: updatedJob.image_url,
+            },
+          }));
+        }
+      } catch (err) {
+        console.warn('Failed to poll draft job:', err);
+      }
+    };
+    
+    const interval = setInterval(pollDraftJob, 3000);
+    return () => clearInterval(interval);
+  }, [currentDraftJob, currentDraft]);
+
+  // Handle delete item
+  const handleDeleteItem = useCallback(async (itemId) => {
+    if (!window.confirm('Are you sure you want to delete this character? This cannot be undone.')) {
+      return;
+    }
+    
+    try {
+      if (onDeleteItem) {
+        await onDeleteItem(itemId);
+      } else {
+        await itemsAPI.delete(itemId);
+      }
+      
+      // Remove from local state
+      setItems(prev => prev.filter(item => item.id !== itemId));
+      setGenerationJobs(prev => {
+        const newJobs = { ...prev };
+        delete newJobs[itemId];
+        return newJobs;
+      });
+      
+      setToastMessage({
+        type: 'success',
+        message: 'Character deleted successfully',
+      });
+    } catch (err) {
+      console.error('Failed to delete item:', err);
+      setToastMessage({
+        type: 'error',
+        message: err.response?.data?.message || 'Failed to delete character',
+      });
+    }
+  }, [onDeleteItem]);
+
   // Filter items
   const getFilteredItems = () => {
     if (filter === 'all') return items;
@@ -356,10 +557,11 @@ function CharacterGallery({
               key={item.id}
               item={item}
               generationJob={generationJobs[item.id]}
-              onCreateVariation={onCreateVariation}
-              onViewDetails={onViewDetails}
+              onCreateVariation={handleOpenVariationEditor}
               onRetry={handleRetry}
+              onDelete={handleDeleteItem}
               onNavigateToVersion={onNavigateToVersion}
+              isAdmin={isAdmin}
             />
           ))}
         </div>
@@ -380,6 +582,22 @@ function CharacterGallery({
           message={toastMessage.message}
           onClose={() => setToastMessage(null)}
           duration={6000}
+        />
+      )}
+      
+      {/* Variation Editor Modal */}
+      {showVariationEditor && selectedParentItem && (
+        <VariationEditor
+          parentItem={selectedParentItem}
+          draftItem={currentDraft}
+          generationJob={currentDraftJob}
+          lockedParams={selectedParentItem.decision?.rules?.locked_params || {}}
+          onCreateVariation={handleCreateVariation}
+          onRegenerate={handleRegenerateDraft}
+          onPublish={handlePublishDraft}
+          onDiscard={handleDiscardDraft}
+          onClose={handleCloseVariationEditor}
+          isLoading={editorLoading}
         />
       )}
     </div>

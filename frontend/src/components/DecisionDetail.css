@@ -1,8 +1,9 @@
 .decision-detail {
-  background: white;
+  background: var(--bg-secondary, #16213e);
   border-radius: 8px;
   padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md, 0 4px 15px rgba(0, 0, 0, 0.4));
+  border: 1px solid var(--border-color, #4a4a6a);
 }
 
 .decision-header {
@@ -20,13 +21,13 @@
   margin: 0;
   font-size: 1.75rem;
   font-weight: 700;
-  color: #333;
+  color: var(--text-primary, #fff);
   flex: 1;
 }
 
 .decision-description {
   margin: 0;
-  color: #666;
+  color: var(--text-muted, #b0b0b0);
   font-size: 1rem;
   line-height: 1.6;
 }
@@ -37,7 +38,7 @@
   gap: 1.5rem;
   margin-bottom: 2rem;
   padding: 1.5rem;
-  background: #f8f9fa;
+  background: var(--bg-tertiary, #0f0f23);
   border-radius: 8px;
 }
 
@@ -51,7 +52,7 @@
   margin: 0;
   font-size: 0.875rem;
   font-weight: 600;
-  color: #666;
+  color: var(--text-muted, #b0b0b0);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -59,21 +60,21 @@
 .detail-value {
   margin: 0;
   font-size: 1rem;
-  color: #333;
+  color: var(--text-secondary, #e8e8e8);
   font-weight: 500;
 }
 
 .status-controls {
   margin-top: 2rem;
   padding-top: 2rem;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--border-color, #4a4a6a);
 }
 
 .controls-label {
   margin: 0 0 1rem 0;
   font-size: 1rem;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary, #fff);
 }
 
 .status-buttons {
@@ -100,38 +101,38 @@
 }
 
 .status-button.open {
-  background-color: #28a745;
+  background: var(--success-gradient, linear-gradient(135deg, #00b894 0%, #55efc4 100%));
   color: white;
 }
 
 .status-button.open:hover {
-  background-color: #218838;
+  box-shadow: 0 4px 15px rgba(0, 184, 148, 0.4);
 }
 
 .status-button.closed {
-  background-color: #17a2b8;
+  background: var(--accent-gradient, linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%));
   color: white;
 }
 
 .status-button.closed:hover {
-  background-color: #138496;
+  box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);
 }
 
 .status-button.archived {
-  background-color: #6f42c1;
+  background: linear-gradient(135deg, #6f42c1 0%, #9b59b6 100%);
   color: white;
 }
 
 .status-button.archived:hover {
-  background-color: #5a32a3;
+  box-shadow: 0 4px 15px rgba(111, 66, 193, 0.4);
 }
 
 .status-note {
   margin: 0;
   padding: 0.75rem;
-  background-color: #fff3cd;
-  border-left: 4px solid #ffc107;
-  color: #856404;
+  background-color: rgba(243, 156, 18, 0.15);
+  border-left: 4px solid var(--warning-color, #f39c12);
+  color: var(--warning-light, #ffeaa7);
   font-size: 0.9rem;
   border-radius: 4px;
 }
@@ -139,7 +140,7 @@
 .loading {
   text-align: center;
   padding: 2rem;
-  color: #666;
+  color: var(--text-muted, #b0b0b0);
 }
 
 /* Mobile responsive */

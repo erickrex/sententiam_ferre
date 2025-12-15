@@ -10,20 +10,21 @@
 }
 
 .rejected-invitations-list .empty-message {
-  color: #666;
+  color: var(--text-muted, #b0b0b0);
   font-style: italic;
 }
 
 .rejected-invitations-list .invitation-card {
-  background: white;
-  border: 1px solid #e0e0e0;
+  background: var(--bg-card, #1e1e3f);
+  border: 1px solid var(--border-color, #4a4a6a);
   border-radius: 8px;
   padding: 1rem;
-  transition: box-shadow 0.2s;
+  transition: all 0.2s;
 }
 
 .rejected-invitations-list .invitation-card:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md, 0 4px 15px rgba(0, 0, 0, 0.4));
+  border-color: var(--accent-primary, #6c5ce7);
 }
 
 .rejected-invitations-list .invitation-header {
@@ -37,7 +38,7 @@
   margin: 0;
   font-size: 1.1rem;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary, #fff);
 }
 
 .rejected-invitations-list .invitation-info {
@@ -45,7 +46,7 @@
 }
 
 .rejected-invitations-list .invitation-date {
-  color: #666;
+  color: var(--text-muted, #b0b0b0);
   font-size: 0.9rem;
 }
 
@@ -68,21 +69,23 @@
 }
 
 .rejected-invitations-list .resend-button {
-  background-color: #2196f3;
+  background: var(--accent-gradient, linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%));
   color: white;
 }
 
 .rejected-invitations-list .resend-button:hover:not(:disabled) {
-  background-color: #0b7dda;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);
 }
 
 .rejected-invitations-list .delete-button {
-  background-color: #f44336;
+  background: var(--error-gradient, linear-gradient(135deg, #e74c3c 0%, #ff6b6b 100%));
   color: white;
 }
 
 .rejected-invitations-list .delete-button:hover:not(:disabled) {
-  background-color: #da190b;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
 }
 
 .rejected-invitations-list .resend-button:disabled,
@@ -97,7 +100,7 @@
 
 .rejected-invitations-list .confirm-message {
   margin: 0 0 0.75rem 0;
-  color: #333;
+  color: var(--text-secondary, #e8e8e8);
   font-size: 0.9rem;
 }
 
@@ -120,21 +123,23 @@
 }
 
 .rejected-invitations-list .cancel-button {
-  background-color: #e0e0e0;
-  color: #333;
+  background-color: var(--bg-tertiary, #0f0f23);
+  color: var(--text-secondary, #e8e8e8);
+  border: 1px solid var(--border-color, #4a4a6a);
 }
 
 .rejected-invitations-list .cancel-button:hover:not(:disabled) {
-  background-color: #d0d0d0;
+  background-color: var(--bg-hover, #252550);
 }
 
 .rejected-invitations-list .confirm-delete-button {
-  background-color: #f44336;
+  background: var(--error-gradient, linear-gradient(135deg, #e74c3c 0%, #ff6b6b 100%));
   color: white;
 }
 
 .rejected-invitations-list .confirm-delete-button:hover:not(:disabled) {
-  background-color: #da190b;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
 }
 
 .rejected-invitations-list .cancel-button:disabled,

@@ -19,7 +19,7 @@
 }
 
 .version-navigator {
-  background: white;
+  background: var(--bg-secondary, #16213e);
   border-radius: 16px;
   max-width: 600px;
   width: 100%;
@@ -27,8 +27,9 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-lg, 0 8px 30px rgba(0, 0, 0, 0.5));
   animation: slideUp 0.3s ease;
+  border: 1px solid var(--border-color, #4a4a6a);
 }
 
 @keyframes slideUp {
@@ -48,8 +49,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
-  border-bottom: 1px solid #e0e0e0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-bottom: 1px solid var(--border-color, #4a4a6a);
+  background: var(--accent-gradient, linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%));
   color: white;
 }
 
@@ -94,7 +95,7 @@
 
 /* Current version info */
 .current-version-info {
-  background: #f8f9fa;
+  background: var(--bg-tertiary, #0f0f23);
   border-radius: 12px;
   padding: 16px;
   margin-bottom: 20px;
@@ -102,7 +103,7 @@
 
 .current-version-label {
   font-size: 0.75rem;
-  color: #666;
+  color: var(--text-muted, #b0b0b0);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 8px;
@@ -111,7 +112,7 @@
 .current-version-name {
   font-size: 1rem;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary, #fff);
   margin-bottom: 4px;
 }
 
@@ -119,7 +120,7 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background: #667eea;
+  background: var(--accent-gradient, linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%));
   color: white;
   padding: 4px 10px;
   border-radius: 12px;
@@ -139,7 +140,7 @@
   align-items: center;
   gap: 6px;
   font-size: 0.85rem;
-  color: #666;
+  color: var(--text-muted, #b0b0b0);
 }
 
 .version-stat .stat-icon {
@@ -154,7 +155,7 @@
 .section-title {
   font-size: 0.85rem;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary, #fff);
   margin-bottom: 12px;
   display: flex;
   align-items: center;
@@ -176,14 +177,14 @@
   align-items: center;
   gap: 12px;
   padding: 10px 12px;
-  background: #fff3cd;
+  background: rgba(243, 156, 18, 0.15);
   border-radius: 8px;
-  border-left: 3px solid #ffc107;
+  border-left: 3px solid var(--warning-color, #f39c12);
 }
 
 .param-diff-name {
   font-weight: 500;
-  color: #333;
+  color: var(--text-primary, #fff);
   min-width: 100px;
 }
 
@@ -195,27 +196,27 @@
 }
 
 .param-diff-old {
-  color: #dc3545;
+  color: var(--error-light, #ff6b6b);
   text-decoration: line-through;
   font-size: 0.85rem;
 }
 
 .param-diff-arrow {
-  color: #666;
+  color: var(--text-muted, #b0b0b0);
 }
 
 .param-diff-new {
-  color: #28a745;
+  color: var(--success-light, #55efc4);
   font-weight: 600;
   font-size: 0.85rem;
 }
 
 .no-diff-message {
-  color: #666;
+  color: var(--text-muted, #b0b0b0);
   font-style: italic;
   font-size: 0.9rem;
   padding: 12px;
-  background: #f8f9fa;
+  background: var(--bg-tertiary, #0f0f23);
   border-radius: 8px;
   text-align: center;
 }
@@ -236,7 +237,7 @@
   align-items: center;
   gap: 12px;
   padding: 10px 12px;
-  background: #f8f9fa;
+  background: var(--bg-tertiary, #0f0f23);
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -244,16 +245,16 @@
 }
 
 .version-chain-item:hover {
-  background: #e9ecef;
+  background: var(--bg-hover, #252550);
 }
 
 .version-chain-item.current {
-  background: #e8f4fd;
-  border-color: #667eea;
+  background: rgba(108, 92, 231, 0.15);
+  border-color: var(--accent-primary, #6c5ce7);
 }
 
 .version-chain-item.root {
-  background: #e8f5e9;
+  background: rgba(0, 184, 148, 0.15);
 }
 
 .chain-connector {
@@ -266,21 +267,21 @@
 .chain-line {
   width: 2px;
   height: 8px;
-  background: #ccc;
+  background: var(--border-color, #4a4a6a);
 }
 
 .chain-dot {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: #667eea;
-  border: 2px solid white;
-  box-shadow: 0 0 0 2px #667eea;
+  background: var(--accent-primary, #6c5ce7);
+  border: 2px solid var(--bg-secondary, #16213e);
+  box-shadow: 0 0 0 2px var(--accent-primary, #6c5ce7);
 }
 
 .version-chain-item.root .chain-dot {
-  background: #28a745;
-  box-shadow: 0 0 0 2px #28a745;
+  background: var(--success-color, #00b894);
+  box-shadow: 0 0 0 2px var(--success-color, #00b894);
 }
 
 .chain-info {
@@ -290,7 +291,7 @@
 
 .chain-label {
   font-weight: 500;
-  color: #333;
+  color: var(--text-primary, #fff);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -298,7 +299,7 @@
 
 .chain-version {
   font-size: 0.75rem;
-  color: #666;
+  color: var(--text-muted, #b0b0b0);
 }
 
 .chain-badge {
@@ -309,13 +310,13 @@
 }
 
 .chain-badge.root-badge {
-  background: #e8f5e9;
-  color: #28a745;
+  background: rgba(0, 184, 148, 0.2);
+  color: var(--success-light, #55efc4);
 }
 
 .chain-badge.current-badge {
-  background: #e8f4fd;
-  color: #667eea;
+  background: rgba(108, 92, 231, 0.2);
+  color: var(--accent-secondary, #a29bfe);
 }
 
 /* Children/variations section */
@@ -334,14 +335,14 @@
   align-items: center;
   gap: 12px;
   padding: 10px 12px;
-  background: #f8f9fa;
+  background: var(--bg-tertiary, #0f0f23);
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .variation-item:hover {
-  background: #e9ecef;
+  background: var(--bg-hover, #252550);
   transform: translateX(4px);
 }
 
@@ -356,7 +357,7 @@
 
 .variation-label {
   font-weight: 500;
-  color: #333;
+  color: var(--text-primary, #fff);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -364,20 +365,20 @@
 
 .variation-version {
   font-size: 0.75rem;
-  color: #666;
+  color: var(--text-muted, #b0b0b0);
 }
 
 .variation-arrow {
-  color: #999;
+  color: var(--text-muted, #b0b0b0);
   font-size: 1.2rem;
 }
 
 .no-variations-message {
-  color: #666;
+  color: var(--text-muted, #b0b0b0);
   font-style: italic;
   font-size: 0.9rem;
   padding: 12px;
-  background: #f8f9fa;
+  background: var(--bg-tertiary, #0f0f23);
   border-radius: 8px;
   text-align: center;
 }
@@ -390,13 +391,14 @@
   justify-content: center;
   padding: 40px;
   gap: 12px;
+  color: var(--text-muted, #b0b0b0);
 }
 
 .loading-spinner {
   width: 32px;
   height: 32px;
-  border: 3px solid #e0e0e0;
-  border-top-color: #667eea;
+  border: 3px solid var(--border-color, #4a4a6a);
+  border-top-color: var(--accent-primary, #6c5ce7);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -409,7 +411,7 @@
 .version-navigator-error {
   padding: 20px;
   text-align: center;
-  color: #dc3545;
+  color: var(--error-light, #ff6b6b);
 }
 
 /* Mobile responsive */

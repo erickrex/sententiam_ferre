@@ -1,83 +1,37 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { decisionsAPI, itemsAPI } from '../services/api';
+import { decisionsAPI, itemsAPI, groupsAPI } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import DecisionDetail from '../components/DecisionDetail';
+import CharacterGallery from '../components/CharacterGallery';
 import './DecisionDetailPage.css';
 
-// Simple Items Tab component with pagination
-function ItemsTab({ items, isAdmin, decisionId }) {
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 20;
+// Helper to extract key parameters from FIBO JSON or attributes
+function extractKeyParams(attributes) {
+  if (!attributes) return [];
   
-  const totalPages = Math.ceil(items.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentItems = items.slice(startIndex, endIndex);
+  const keyParams = [];
+  const fibo = attributes.fibo_json;
   
-  return (
-    <div className="items-tab">
-      <div className="tab-header">
-        <h2>Items ({items.length})</h2>
-        {isAdmin ? (
-          <Link 
-            to={`/decisions/${decisionId}/items`}
-            className="manage-items-button"
-          >
-            Manage Items
-          </Link>
-        ) : (
-          <button 
-            className="manage-items-button"
-            disabled
-            title="Only admins can manage items"
-          >
-            Manage Items
-          </button>
-        )}
-      </div>
-      
-      {items.length === 0 ? (
-        <div className="empty-state">
-          <p>No items yet.</p>
-          {isAdmin && <p>Add items for members to vote on!</p>}
-        </div>
-      ) : (
-        <>
-          <ul className="items-simple-list">
-            {currentItems.map((item, index) => (
-              <li key={item.id} className="item-row">
-                <span className="item-number">{startIndex + index + 1}.</span>
-                <span className="item-name">{item.label}</span>
-              </li>
-            ))}
-          </ul>
-          
-          {totalPages > 1 && (
-            <div className="pagination">
-              <button 
-                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
-                className="pagination-btn"
-              >
-                ← Previous
-              </button>
-              <span className="pagination-info">
-                Page {currentPage} of {totalPages}
-              </span>
-              <button 
-                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                disabled={currentPage === totalPages}
-                className="pagination-btn"
-              >
-                Next →
-              </button>
-            </div>
-          )}
-        </>
-      )}
-    </div>
-  );
+  if (fibo) {
+    // Extract from FIBO structured_prompt
+    const sp = fibo.structured_prompt || {};
+    if (sp.art_style) keyParams.push({ key: 'Style', value: sp.art_style });
+    if (sp.character?.pose) keyParams.push({ key: 'Pose', value: sp.character.pose });
+    if (sp.character?.expression) keyParams.push({ key: 'Expression', value: sp.character.expression });
+    if (sp.scene?.setting) keyParams.push({ key: 'Setting', value: sp.scene.setting });
+    if (sp.colors?.palette) keyParams.push({ key: 'Palette', value: sp.colors.palette });
+  } else {
+    // Fallback to generation_params
+    const params = attributes.generation_params || {};
+    if (params.art_style) keyParams.push({ key: 'Style', value: params.art_style });
+    if (params.pose) keyParams.push({ key: 'Pose', value: params.pose });
+    if (params.expression) keyParams.push({ key: 'Expression', value: params.expression });
+    if (params.view_angle) keyParams.push({ key: 'View', value: params.view_angle });
+    if (params.color_palette) keyParams.push({ key: 'Palette', value: params.color_palette });
+  }
+  
+  return keyParams.slice(0, 4); // Max 4 params
 }
 
 function DecisionDetailPage() {
@@ -92,6 +46,7 @@ function DecisionDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const loadDecisionData = useCallback(async () => {
     try {
@@ -103,9 +58,16 @@ function DecisionDetailPage() {
       const decisionData = decisionResponse.data.data || decisionResponse.data;
       setDecision(decisionData);
       
-      // Check if user is admin (creator or group admin)
-      // This is a simplified check - in production, you'd verify group membership
-      setIsAdmin(true); // For now, assume user can manage their decisions
+      // Check if user is admin of the group
+      try {
+        const membersResponse = await groupsAPI.listMembers(decisionData.group);
+        const members = membersResponse.data.data || [];
+        const currentUserMembership = members.find(m => m.user?.id === user?.id);
+        setIsAdmin(currentUserMembership?.role === 'admin');
+      } catch (err) {
+        console.error('Failed to check admin status:', err);
+        setIsAdmin(false);
+      }
       
       // Load items and favourites
       const [itemsResponse, favouritesResponse] = await Promise.all([
@@ -128,7 +90,7 @@ function DecisionDetailPage() {
     } finally {
       setLoading(false);
     }
-  }, [decisionId]);
+  }, [decisionId, user]);
 
   useEffect(() => {
     loadDecisionData();
@@ -142,6 +104,18 @@ function DecisionDetailPage() {
       setError(err.message || 'Failed to update decision status');
     }
   };
+
+  const handleDeleteItem = async (itemId) => {
+    try {
+      await itemsAPI.delete(itemId);
+      setRefreshTrigger(prev => prev + 1);
+    } catch (err) {
+      console.error('Failed to delete item:', err);
+    }
+  };
+
+  // Check if this is a 2D character decision
+  const isCharacterDecision = decision?.item_type === '2d_character';
 
   if (loading) {
     return <div className="loading-page">Loading decision...</div>;
@@ -212,26 +186,59 @@ function DecisionDetailPage() {
         )}
 
         {activeTab === 'items' && (
-          <ItemsTab 
-            items={items} 
-            isAdmin={isAdmin} 
-            decisionId={decisionId} 
-          />
+          <div className="items-tab">
+            <div className="tab-header">
+              <h2>Items ({items.length})</h2>
+              {isAdmin && (
+                <Link 
+                  to={`/decisions/${decisionId}/items`}
+                  className="manage-items-button"
+                >
+                  + Add Items
+                </Link>
+              )}
+            </div>
+            
+            {isCharacterDecision ? (
+              <CharacterGallery
+                decisionId={decisionId}
+                onDeleteItem={handleDeleteItem}
+                refreshTrigger={refreshTrigger}
+                isAdmin={isAdmin}
+              />
+            ) : (
+              items.length === 0 ? (
+                <div className="empty-state">
+                  <p>No items yet.</p>
+                  {isAdmin && <p>Add items for members to vote on!</p>}
+                </div>
+              ) : (
+                <ul className="items-simple-list">
+                  {items.map((item, index) => (
+                    <li key={item.id} className="item-row">
+                      <span className="item-number">{index + 1}.</span>
+                      <span className="item-name">{item.label}</span>
+                    </li>
+                  ))}
+                </ul>
+              )
+            )}
+          </div>
         )}
 
         {activeTab === 'favourites' && (
           <div className="favourites-tab">
             <div className="tab-header">
-              <h2>Favourites</h2>
+              <h2>Favourites ({favourites.length})</h2>
               <Link 
                 to={`/decisions/${decisionId}/favourites`}
                 className="view-all-link"
               >
-                View Full Page →
+                Export Options →
               </Link>
             </div>
             <p className="tab-description">
-              Items that have met the approval threshold
+              Characters that have met the approval threshold
             </p>
             
             {favourites.length === 0 ? (
@@ -240,32 +247,45 @@ function DecisionDetailPage() {
                 <p>Items will appear here once they meet the approval rule.</p>
               </div>
             ) : (
-              <div className="favourites-list">
-                {favourites.map((favourite) => (
-                  <div key={favourite.id} className="favourite-card">
-                    <h3 className="favourite-label">
-                      {favourite.item?.label || 'Unknown Item'}
-                    </h3>
-                    {favourite.snapshot && (
-                      <div className="favourite-snapshot">
-                        <span className="snapshot-item">
-                          Approvals: {favourite.snapshot.approvals || 0}
-                        </span>
-                        <span className="snapshot-item">
-                          Total Members: {favourite.snapshot.total_members || 0}
-                        </span>
-                        {favourite.snapshot.approval_percentage && (
-                          <span className="snapshot-item">
-                            {Math.round(favourite.snapshot.approval_percentage)}% approved
-                          </span>
+              <div className="favourites-grid-view">
+                {favourites.map((favourite) => {
+                  const item = favourite.item || {};
+                  const attributes = item.attributes || {};
+                  const keyParams = extractKeyParams(attributes);
+                  
+                  return (
+                    <div key={favourite.id} className="favourite-grid-card">
+                      {attributes.image_url ? (
+                        <img 
+                          src={attributes.image_url} 
+                          alt={item.label} 
+                          className="favourite-grid-image"
+                        />
+                      ) : (
+                        <div className="favourite-grid-placeholder">
+                          <span>⭐</span>
+                        </div>
+                      )}
+                      <div className="favourite-grid-content">
+                        <h3 className="favourite-grid-label">{item.label || 'Unknown'}</h3>
+                        {keyParams.length > 0 && (
+                          <div className="favourite-grid-params">
+                            {keyParams.map((param, idx) => (
+                              <span key={idx} className="param-tag">
+                                {param.key}: {param.value}
+                              </span>
+                            ))}
+                          </div>
                         )}
+                        <div className="favourite-grid-approval">
+                          <span className="approval-badge">
+                            ✓ {favourite.snapshot?.approvals || 0}/{favourite.snapshot?.total_members || 0}
+                          </span>
+                        </div>
                       </div>
-                    )}
-                    <div className="favourite-meta">
-                      Selected on {new Date(favourite.selected_at).toLocaleDateString()}
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

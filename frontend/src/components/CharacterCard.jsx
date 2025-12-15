@@ -14,10 +14,11 @@ function CharacterCard({
   item, 
   generationJob,
   onCreateVariation,
-  onViewDetails,
   onRetry,
+  onDelete,
   onNavigateToVersion,
-  showActions = true
+  showActions = true,
+  isAdmin = false,
 }) {
   const [showVersionNavigator, setShowVersionNavigator] = useState(false);
   
@@ -174,14 +175,16 @@ function CharacterCard({
                   <span className="btn-icon">🔄</span>
                   Create Variation
                 </button>
-                <button 
-                  className="action-btn secondary"
-                  onClick={() => onViewDetails?.(item)}
-                  title="View full details"
-                >
-                  <span className="btn-icon">👁️</span>
-                  Details
-                </button>
+                {isAdmin && onDelete && (
+                  <button 
+                    className="action-btn delete"
+                    onClick={() => onDelete?.(item.id)}
+                    title="Delete this character"
+                  >
+                    <span className="btn-icon">🗑️</span>
+                    Delete
+                  </button>
+                )}
               </>
             )}
             {status === 'failed' && onRetry && (

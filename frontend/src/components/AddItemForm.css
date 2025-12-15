@@ -1,15 +1,16 @@
 .add-item-form {
-  background: white;
+  background: var(--bg-secondary, #16213e);
   border-radius: 8px;
   padding: 1.5rem;
   max-width: 600px;
   margin: 0 auto;
+  border: 1px solid var(--border-color, #4a4a6a);
 }
 
 .form-title {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary, #fff);
   margin: 0 0 1.5rem 0;
 }
 
@@ -20,55 +21,58 @@
 .form-label {
   display: block;
   font-weight: 600;
-  color: #333;
+  color: var(--text-secondary, #e8e8e8);
   margin-bottom: 0.5rem;
   font-size: 0.95rem;
 }
 
 .required {
-  color: #d32f2f;
+  color: var(--error-light, #ff6b6b);
 }
 
 .form-input {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-color, #4a4a6a);
   border-radius: 4px;
   font-size: 1rem;
   transition: border-color 0.2s;
   box-sizing: border-box;
+  background-color: var(--bg-tertiary, #0f0f23);
+  color: var(--text-primary, #fff);
 }
 
 .form-input:focus {
   outline: none;
-  border-color: #1976d2;
+  border-color: var(--accent-primary, #6c5ce7);
 }
 
 .form-input.error {
-  border-color: #d32f2f;
+  border-color: var(--error-color, #e74c3c);
 }
 
 .field-error {
   display: block;
-  color: #d32f2f;
+  color: var(--error-light, #ff6b6b);
   font-size: 0.85rem;
   margin-top: 0.25rem;
 }
 
 .field-hint {
   display: block;
-  color: #666;
+  color: var(--text-muted, #b0b0b0);
   font-size: 0.85rem;
   margin-top: 0.25rem;
 }
 
 .error-message {
-  background-color: #ffebee;
-  color: #c62828;
+  background-color: rgba(231, 76, 60, 0.15);
+  color: var(--error-light, #ff6b6b);
   padding: 0.75rem;
   border-radius: 4px;
   margin-bottom: 1rem;
   font-size: 0.9rem;
+  border: 1px solid var(--error-color, #e74c3c);
 }
 
 .attributes-list {
@@ -77,7 +81,7 @@
   gap: 0.5rem;
   margin-bottom: 1rem;
   padding: 0.75rem;
-  background-color: #f5f5f5;
+  background-color: var(--bg-tertiary, #0f0f23);
   border-radius: 4px;
 }
 
@@ -86,7 +90,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.5rem;
-  background-color: white;
+  background-color: var(--bg-secondary, #16213e);
   border-radius: 4px;
   gap: 0.5rem;
 }
@@ -95,16 +99,17 @@
   flex: 1;
   font-size: 0.9rem;
   word-break: break-word;
+  color: var(--text-secondary, #e8e8e8);
 }
 
 .attribute-display strong {
-  color: #555;
+  color: var(--text-muted, #b0b0b0);
 }
 
 .remove-attribute-button {
   background: none;
   border: none;
-  color: #d32f2f;
+  color: var(--error-light, #ff6b6b);
   font-size: 1.25rem;
   cursor: pointer;
   padding: 0.25rem 0.5rem;
@@ -131,20 +136,22 @@
 .attribute-key-input,
 .attribute-value-input {
   padding: 0.75rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-color, #4a4a6a);
   border-radius: 4px;
   font-size: 0.95rem;
   box-sizing: border-box;
+  background-color: var(--bg-tertiary, #0f0f23);
+  color: var(--text-primary, #fff);
 }
 
 .attribute-key-input:focus,
 .attribute-value-input:focus {
   outline: none;
-  border-color: #1976d2;
+  border-color: var(--accent-primary, #6c5ce7);
 }
 
 .add-attribute-button {
-  background-color: #1976d2;
+  background: var(--accent-gradient, linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%));
   color: white;
   border: none;
   padding: 0.75rem 1.25rem;
@@ -152,17 +159,18 @@
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
   white-space: nowrap;
   min-height: 44px;
 }
 
 .add-attribute-button:hover {
-  background-color: #1565c0;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);
 }
 
 .add-attribute-button:disabled {
-  background-color: #ccc;
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
@@ -172,7 +180,7 @@
   justify-content: flex-end;
   margin-top: 2rem;
   padding-top: 1rem;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--border-color, #4a4a6a);
 }
 
 .cancel-button,
@@ -189,26 +197,28 @@
 }
 
 .cancel-button {
-  background-color: #f5f5f5;
-  color: #333;
+  background-color: var(--bg-tertiary, #0f0f23);
+  color: var(--text-secondary, #e8e8e8);
+  border: 1px solid var(--border-color, #4a4a6a);
 }
 
 .cancel-button:hover {
-  background-color: #e0e0e0;
+  background-color: var(--bg-hover, #252550);
 }
 
 .submit-button {
-  background-color: #1976d2;
+  background: var(--accent-gradient, linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%));
   color: white;
 }
 
 .submit-button:hover {
-  background-color: #1565c0;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(108, 92, 231, 0.5);
 }
 
 .cancel-button:disabled,
 .submit-button:disabled {
-  background-color: #ccc;
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
