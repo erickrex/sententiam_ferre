@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import SwipeCardStack from '../components/SwipeCardStack';
+import CharacterWizard from '../components/CharacterWizard';
 import Toast from '../components/Toast';
-import { itemsAPI, votingAPI, decisionsAPI } from '../services/api';
+import { itemsAPI, votingAPI, decisionsAPI, generationAPI } from '../services/api';
 import './VotingPage.css';
 
 /**
@@ -23,11 +24,12 @@ function VotingPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [decision, setDecision] = useState(null);
-  const [showRating, setShowRating] = useState(false);
-  const [ratingValue, setRatingValue] = useState(3);
   const [voteHistory, setVoteHistory] = useState([]);
   const [toast, setToast] = useState(null);
   const [pendingCount, setPendingCount] = useState(0);
+  const [showWizard, setShowWizard] = useState(false);
+  // eslint-disable-next-line no-unused-vars
+  const [isGenerating, setIsGenerating] = useState(false);
 
   /**
    * Check if an item is ready for voting.
@@ -130,16 +132,6 @@ function VotingPage() {
     await submitVote(currentItem.id, isLike, null);
   };
 
-  // Handle rating submission
-  const handleRatingSubmit = async () => {
-    const currentItem = items[currentIndex];
-    if (!currentItem) return;
-    
-    await submitVote(currentItem.id, null, ratingValue);
-    setShowRating(false);
-    setRatingValue(3);
-  };
-
   // Submit vote to API
   const submitVote = async (itemId, isLike, rating) => {
     try {
@@ -186,6 +178,54 @@ function VotingPage() {
     } catch (err) {
       console.error('Error undoing vote:', err);
       setToast({ message: err.message || 'Failed to undo vote', type: 'error' });
+    }
+  };
+
+  // Handle creating a variation from the current item
+  const handleCreateVariation = () => {
+    setShowWizard(true);
+  };
+
+  // Handle wizard generation
+  const handleWizardGenerate = async (wizardContext) => {
+    setIsGenerating(true);
+    try {
+      // Create a new character (not a variation, since we want it as a new item)
+      const response = await generationAPI.createGeneration(decisionId, wizardContext.apiParams);
+      const data = response.data?.data || response.data;
+      
+      return {
+        imageUrl: data?.attributes?.image_url || data?.image_url,
+        item: data,
+      };
+    } catch (err) {
+      console.error('Failed to create character:', err);
+      throw err;
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  // Handle wizard completion - add the new item and navigate to vote on it
+  const handleWizardComplete = async (result) => {
+    setShowWizard(false);
+    
+    if (result?.item) {
+      // Add the new item to the list and navigate to it
+      const newItem = { ...result.item, hasVoted: false };
+      
+      // Insert the new item right after the current one so user votes on it next
+      const newItems = [...items];
+      newItems.splice(currentIndex + 1, 0, newItem);
+      setItems(newItems);
+      
+      // Move to the new item
+      setCurrentIndex(currentIndex + 1);
+      
+      setToast({ message: 'Character created! Vote on it now.', type: 'success' });
+    } else {
+      // Refresh items to get the new one
+      setToast({ message: 'Character created!', type: 'success' });
     }
   };
 
@@ -266,11 +306,12 @@ function VotingPage() {
           </button>
           
           <button 
-            className="vote-button vote-button-rating"
-            onClick={() => setShowRating(!showRating)}
+            className="vote-button vote-button-create"
+            onClick={handleCreateVariation}
+            disabled={isGenerating}
           >
-            <span className="button-icon">★</span>
-            <span className="button-label">Rate</span>
+            <span className="button-icon">✨</span>
+            <span className="button-label">{isGenerating ? 'Creating...' : 'Create'}</span>
           </button>
           
           <button 
@@ -283,38 +324,16 @@ function VotingPage() {
         </div>
       )}
 
-      {/* Rating input */}
-      {showRating && currentIndex < items.length && (
-        <div className="rating-modal">
-          <div className="rating-content">
-            <h3>Rate this item</h3>
-            <div className="rating-stars">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <button
-                  key={star}
-                  className={`star-button ${star <= ratingValue ? 'star-active' : ''}`}
-                  onClick={() => setRatingValue(star)}
-                >
-                  ★
-                </button>
-              ))}
-            </div>
-            <div className="rating-actions">
-              <button 
-                className="rating-cancel"
-                onClick={() => setShowRating(false)}
-              >
-                Cancel
-              </button>
-              <button 
-                className="rating-submit"
-                onClick={handleRatingSubmit}
-              >
-                Submit Rating
-              </button>
-            </div>
-          </div>
-        </div>
+      {/* Character Wizard for creating new variations */}
+      {showWizard && (
+        <CharacterWizard
+          onGenerate={handleWizardGenerate}
+          onComplete={handleWizardComplete}
+          onCancel={() => setShowWizard(false)}
+          isVariation={false}
+          parentItem={null}
+          lockedParams={decision?.rules?.locked_params || {}}
+        />
       )}
 
       {/* Undo button - show if there's history, even after all items voted */}

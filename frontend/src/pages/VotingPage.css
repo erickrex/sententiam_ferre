@@ -114,6 +114,17 @@
   color: #000;
 }
 
+.vote-button-create {
+  background: var(--accent-gradient, linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%));
+  color: white;
+}
+
+.vote-button-create:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
 .button-icon {
   font-size: 2rem;
   line-height: 1;

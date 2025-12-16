@@ -148,15 +148,6 @@ function GroupDetailPage() {
     }
   };
 
-  const handleUpdateMembership = async (userId, updates) => {
-    try {
-      await groupsAPI.updateMembership(groupId, userId, updates);
-      await loadGroupData();
-    } catch (err) {
-      setError(err.message || 'Failed to update membership');
-    }
-  };
-
   const handleDeclineInvitation = async () => {
     if (!window.confirm('Are you sure you want to decline this invitation?')) {
       return;
@@ -243,7 +234,16 @@ function GroupDetailPage() {
     );
   }
 
-  const isAdmin = members.find(m => m.user?.id === user?.id)?.role === 'admin';
+  const currentMembership = members.find(m => m.user?.id === user?.id);
+  const isAdmin = currentMembership?.role === 'admin';
+  
+  // Debug: log admin status
+  console.log('Admin check:', { 
+    userId: user?.id, 
+    currentMembership, 
+    isAdmin,
+    members: members.map(m => ({ userId: m.user?.id, role: m.role }))
+  });
 
   return (
     <div className="group-detail-page">
@@ -343,9 +343,42 @@ function GroupDetailPage() {
               members={members}
               onInvite={() => setShowInviteModal(true)}
               onRemoveMember={handleRemoveMember}
-              onUpdateMembership={handleUpdateMembership}
+              onApproveJoinRequest={handleApproveRequest}
+              onRejectJoinRequest={handleRejectRequest}
               isAdmin={isAdmin}
             />
+            
+            {isAdmin && joinRequests.length > 0 && (
+              <div className="admin-section">
+                <div 
+                  className="admin-section-header"
+                  onClick={() => !adminDataLoading && toggleSection('joinRequests')}
+                >
+                  <h2 className="section-title">Pending Join Requests ({joinRequests.length})</h2>
+                  {!adminDataLoading && (
+                    <button 
+                      className={`collapse-toggle ${collapsedSections.joinRequests ? 'collapsed' : ''}`}
+                      aria-label={collapsedSections.joinRequests ? 'Expand section' : 'Collapse section'}
+                    >
+                      ▼
+                    </button>
+                  )}
+                </div>
+                <div className={`admin-section-content ${collapsedSections.joinRequests ? 'collapsed' : 'expanded'}`}>
+                  {adminDataLoading ? (
+                    <SkeletonLoader type="card" count={2} />
+                  ) : (
+                    <JoinRequestsList
+                      requests={joinRequests}
+                      onApprove={handleApproveRequest}
+                      onReject={handleRejectRequest}
+                      onSuccess={showSuccess}
+                      onError={showError}
+                    />
+                  )}
+                </div>
+              </div>
+            )}
             
             {isAdmin && rejectedInvitations.length > 0 && (
               <div className="admin-section">

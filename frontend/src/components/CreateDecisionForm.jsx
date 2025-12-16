@@ -123,7 +123,7 @@ function CreateDecisionForm({ groupId, onSubmit, onCancel }) {
       
       <div className="form-group">
         <label htmlFor="item_type" className="form-label">
-          Item Type <span className="required">*</span>
+          Decision Type <span className="required">*</span>
         </label>
         <select
           id="item_type"
@@ -133,20 +133,14 @@ function CreateDecisionForm({ groupId, onSubmit, onCancel }) {
           className={`form-select ${errors.item_type ? 'error' : ''}`}
           disabled={isSubmitting}
         >
-          <option value="">Select item type...</option>
-          <option value="2d_character">🎨 2D Character (AI-generated game art)</option>
-          <option value="restaurant">🍽️ Restaurant</option>
-          <option value="movie">🎬 Movie</option>
-          <option value="destination">✈️ Destination</option>
-          <option value="product">📦 Product</option>
-          <option value="name">📝 Name (baby names, pet names, etc.)</option>
-          <option value="other">📋 Other</option>
+          <option value="">Select decision type...</option>
+          <option value="2d_character">🎮 2D Game Characters</option>
         </select>
         {errors.item_type && <span className="field-error">{errors.item_type}</span>}
         <span className="field-hint">
           {formData.item_type === '2d_character' 
-            ? '🎮 Create AI-generated 2D characters for your mobile game using BRIA\'s image generation.'
-            : 'What type of items will you be voting on?'}
+            ? '✨ Create AI-generated 2D characters using BRIA FIBO with structured JSON control. Perfect for mobile game development teams.'
+            : 'Choose the type of decision for your group.'}
         </span>
       </div>
       

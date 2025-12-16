@@ -37,21 +37,21 @@ class PromptBuilder:
         "hand_drawn": "hand-drawn style, sketchy lines, organic feel, artistic strokes",
     }
     
-    # Pose modifiers
+    # Pose modifiers (using safe, family-friendly language)
     POSE_MODIFIERS: Dict[str, str] = {
-        "idle": "standing idle pose, relaxed stance",
-        "action": "dynamic action pose, movement energy",
+        "idle": "standing pose, relaxed stance",
+        "action": "dynamic pose, movement energy",
         "jumping": "mid-jump pose, airborne, dynamic",
-        "attacking": "attack pose, aggressive stance, powerful",
+        "attacking": "action pose, ready stance, powerful",
         "celebrating": "celebration pose, arms raised, joyful",
     }
     
-    # Expression modifiers
+    # Expression modifiers (using safe, family-friendly language)
     EXPRESSION_MODIFIERS: Dict[str, str] = {
         "neutral": "neutral expression, calm face",
         "happy": "happy expression, smiling, cheerful",
-        "angry": "angry expression, fierce look, intense",
-        "surprised": "surprised expression, wide eyes, shocked",
+        "angry": "intense expression, focused look",
+        "surprised": "surprised expression, wide eyes",
         "determined": "determined expression, focused, resolute",
     }
     

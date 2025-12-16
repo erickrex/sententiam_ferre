@@ -152,6 +152,8 @@ class GenerationJobProcessor:
             )
             
             # Submit to BRIA FIBO API
+            logger.info(f"Submitting prompt to BRIA FIBO: {prompt}")
+            print(f"[GENERATION] Submitting prompt to BRIA: {prompt}")
             try:
                 result = self.bria_client.generate(prompt=prompt, sync=False)
                 
@@ -214,7 +216,18 @@ class GenerationJobProcessor:
                 # Mark as failed
                 logger.error(f"Failed to submit job {job.id}: {e}")
                 job.status = "failed"
-                job.error_message = str(e)
+                
+                # Check for content moderation error and provide helpful message
+                error_str = str(e)
+                if "content moderation" in error_str.lower() or "422" in error_str:
+                    job.error_message = (
+                        "Your description was flagged by content moderation. "
+                        "Try using simpler, family-friendly terms. "
+                        "Avoid words like 'attacking', 'angry', 'weapon', etc."
+                    )
+                else:
+                    job.error_message = error_str
+                
                 job.save(update_fields=["status", "error_message", "updated_at"])
                 raise GenerationJobProcessorError(f"Failed to submit job: {e}") from e
         

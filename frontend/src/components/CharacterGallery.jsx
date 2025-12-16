@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { itemsAPI, generationAPI } from '../services/api';
 import CharacterCard from './CharacterCard';
-import VariationEditor from './VariationEditor';
+import CharacterWizard from './CharacterWizard';
 import Toast from './Toast';
 import './CharacterGallery.css';
 
@@ -18,7 +18,6 @@ const GENERATION_TIMEOUT_MS = 40000;
 
 function CharacterGallery({ 
   decisionId, 
-  onCreateVariation,
   onNavigateToVersion,
   onDeleteItem,
   refreshTrigger = 0,
@@ -33,12 +32,11 @@ function CharacterGallery({
   const [filter, setFilter] = useState('all'); // 'all', 'completed', 'pending', 'failed'
   const [toastMessage, setToastMessage] = useState(null);
   
-  // Variation editor state
+  // Variation wizard state
   const [showVariationEditor, setShowVariationEditor] = useState(false);
   const [selectedParentItem, setSelectedParentItem] = useState(null);
   const [currentDraft, setCurrentDraft] = useState(null);
   const [currentDraftJob, setCurrentDraftJob] = useState(null);
-  const [editorLoading, setEditorLoading] = useState(false);
   
   const pollIntervalRef = useRef(null);
   const isMountedRef = useRef(true);
@@ -260,115 +258,40 @@ function CharacterGallery({
     setShowVariationEditor(true);
   }, []);
 
-  // Create a new draft variation
-  const handleCreateVariation = useCallback(async (parentItemId, parameters) => {
-    setEditorLoading(true);
+  // Handle wizard generation for variations
+  const handleWizardGenerate = useCallback(async (wizardContext) => {
     try {
-      const response = await generationAPI.createVariation(parentItemId, parameters, true);
+      // Use the pre-built API params from the wizard
+      const response = await generationAPI.createVariation(
+        selectedParentItem.id, 
+        wizardContext.apiParams, 
+        true // create as draft
+      );
       const data = response.data.data || response.data;
       
-      setCurrentDraft(data.item);
-      setCurrentDraftJob(data.job);
-      
-      // Start polling for this draft's job
-      loadItems(true);
-      
-      setToastMessage({
-        type: 'info',
-        message: 'Generating preview...',
-      });
+      return {
+        imageUrl: data.item?.attributes?.image_url || data.job?.image_url,
+        item: data.item,
+      };
     } catch (err) {
       console.error('Failed to create variation:', err);
-      setToastMessage({
-        type: 'error',
-        message: err.response?.data?.message || 'Failed to create variation',
-      });
-    } finally {
-      setEditorLoading(false);
+      throw err;
     }
-  }, [loadItems]);
+  }, [selectedParentItem]);
 
-  // Regenerate an existing draft
-  const handleRegenerateDraft = useCallback(async (draftItemId, parameters) => {
-    setEditorLoading(true);
-    try {
-      const response = await generationAPI.regenerateDraft(draftItemId, parameters);
-      const data = response.data.data || response.data;
-      
-      setCurrentDraft(data.item);
-      setCurrentDraftJob(data.job);
-      
-      loadItems(true);
-      
-      setToastMessage({
-        type: 'info',
-        message: 'Regenerating preview...',
-      });
-    } catch (err) {
-      console.error('Failed to regenerate draft:', err);
-      setToastMessage({
-        type: 'error',
-        message: err.response?.data?.message || 'Failed to regenerate',
-      });
-    } finally {
-      setEditorLoading(false);
-    }
-  }, [loadItems]);
-
-  // Publish a draft to make it visible to the group
-  const handlePublishDraft = useCallback(async (draftItemId) => {
-    setEditorLoading(true);
-    try {
-      await generationAPI.publishItem(draftItemId);
-      
-      setShowVariationEditor(false);
-      setSelectedParentItem(null);
-      setCurrentDraft(null);
-      setCurrentDraftJob(null);
-      
-      loadItems();
-      
-      setToastMessage({
-        type: 'success',
-        message: 'Variation published! It\'s now visible to your group.',
-      });
-    } catch (err) {
-      console.error('Failed to publish draft:', err);
-      setToastMessage({
-        type: 'error',
-        message: err.response?.data?.message || 'Failed to publish',
-      });
-    } finally {
-      setEditorLoading(false);
-    }
-  }, [loadItems]);
-
-  // Discard a draft
-  const handleDiscardDraft = useCallback(async (draftItemId) => {
-    setEditorLoading(true);
-    try {
-      await generationAPI.discardDraft(draftItemId);
-      
-      setShowVariationEditor(false);
-      setSelectedParentItem(null);
-      setCurrentDraft(null);
-      setCurrentDraftJob(null);
-      
-      loadItems(true);
-      
-      setToastMessage({
-        type: 'info',
-        message: 'Draft discarded',
-      });
-    } catch (err) {
-      console.error('Failed to discard draft:', err);
-      setToastMessage({
-        type: 'error',
-        message: err.response?.data?.message || 'Failed to discard draft',
-      });
-    } finally {
-      setEditorLoading(false);
-    }
+  // Handle wizard completion for variations
+  const handleWizardComplete = useCallback(() => {
+    setShowVariationEditor(false);
+    setSelectedParentItem(null);
+    setCurrentDraft(null);
+    setCurrentDraftJob(null);
+    
+    loadItems();
+    
+    setToastMessage({
+      type: 'success',
+      message: 'Variation created! It\'s now visible to your group.',
+    });
   }, [loadItems]);
 
   // Close variation editor
@@ -585,19 +508,15 @@ function CharacterGallery({
         />
       )}
       
-      {/* Variation Editor Modal */}
+      {/* Character Wizard for Variations */}
       {showVariationEditor && selectedParentItem && (
-        <VariationEditor
+        <CharacterWizard
+          onGenerate={handleWizardGenerate}
+          onComplete={handleWizardComplete}
+          onCancel={handleCloseVariationEditor}
+          isVariation={true}
           parentItem={selectedParentItem}
-          draftItem={currentDraft}
-          generationJob={currentDraftJob}
           lockedParams={selectedParentItem.decision?.rules?.locked_params || {}}
-          onCreateVariation={handleCreateVariation}
-          onRegenerate={handleRegenerateDraft}
-          onPublish={handlePublishDraft}
-          onDiscard={handleDiscardDraft}
-          onClose={handleCloseVariationEditor}
-          isLoading={editorLoading}
         />
       )}
     </div>

@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ItemList from '../components/ItemList';
 import AddItemForm from '../components/AddItemForm';
 import ItemFilter from '../components/ItemFilter';
 import Toast from '../components/Toast';
-import CharacterCreationForm from '../components/CharacterCreationForm';
+import CharacterWizard from '../components/CharacterWizard';
 import CharacterGallery from '../components/CharacterGallery';
 import { itemsAPI, taxonomiesAPI, decisionsAPI, generationAPI, groupsAPI } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
@@ -25,7 +25,6 @@ function ItemManagementPage() {
   const [toast, setToast] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const [isGenerating, setIsGenerating] = useState(false);
 
   // Check if this is a 2D character decision
   const isCharacterDecision = decision?.item_type === '2d_character';
@@ -132,21 +131,30 @@ function ItemManagementPage() {
     }
   };
 
-  // Handle character generation (for 2D character decisions)
-  const handleCreateCharacter = async (characterData) => {
+  // Handle character generation via wizard (for 2D character decisions)
+  const handleWizardGenerate = async (wizardContext) => {
     try {
-      setIsGenerating(true);
-      await generationAPI.createGeneration(decisionId, characterData);
-      showToast('Character generation started! It will appear in the gallery shortly.', 'success');
-      setShowAddForm(false);
-      setRefreshTrigger(prev => prev + 1);
+      // Use the pre-built API params from the wizard
+      // These are already in the correct format for the backend:
+      // { description, art_style, view_angle, pose, expression, color_palette, background }
+      const response = await generationAPI.createGeneration(decisionId, wizardContext.apiParams);
+      
+      return {
+        imageUrl: response.data?.data?.attributes?.image_url || response.data?.image_url,
+        item: response.data?.data,
+      };
     } catch (err) {
       console.error('Failed to create character:', err);
-      showToast(err.message || 'Failed to create character', 'error');
       throw err;
-    } finally {
-      setIsGenerating(false);
     }
+  };
+
+  // Handle wizard completion
+  const handleWizardComplete = () => {
+    showToast('Character created successfully!', 'success');
+    setShowAddForm(false);
+    setEditingItem(null);
+    setRefreshTrigger(prev => prev + 1);
   };
 
   // Handle creating a variation of an existing character
@@ -238,19 +246,19 @@ function ItemManagementPage() {
         )}
       </div>
 
-      {/* Character Creation Form (for 2D character decisions) */}
+      {/* Character Wizard (for 2D character decisions) */}
       {isCharacterDecision && (showAddForm || editingItem) && (
-        <div className="form-container">
-          <CharacterCreationForm
-            lockedParams={lockedParams}
-            onSubmit={handleCreateCharacter}
-            onCancel={() => {
-              setShowAddForm(false);
-              setEditingItem(null);
-            }}
-            isSubmitting={isGenerating}
-          />
-        </div>
+        <CharacterWizard
+          onGenerate={handleWizardGenerate}
+          onComplete={handleWizardComplete}
+          onCancel={() => {
+            setShowAddForm(false);
+            setEditingItem(null);
+          }}
+          isVariation={editingItem?.isVariation || false}
+          parentItem={editingItem?.isVariation ? editingItem : null}
+          lockedParams={lockedParams}
+        />
       )}
 
       {/* Regular Item Form (for non-character decisions) */}

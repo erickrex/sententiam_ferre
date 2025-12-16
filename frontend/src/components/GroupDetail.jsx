@@ -1,7 +1,7 @@
 import React from 'react';
 import './GroupDetail.css';
 
-function GroupDetail({ group, members, onInvite, onRemoveMember, onUpdateMembership, isAdmin }) {
+function GroupDetail({ group, members, onInvite, onRemoveMember, onApproveJoinRequest, onRejectJoinRequest, isAdmin }) {
   if (!group) {
     return <div className="loading">Loading group details...</div>;
   }
@@ -95,13 +95,13 @@ function GroupDetail({ group, members, onInvite, onRemoveMember, onUpdateMembers
                   <div className="member-actions">
                     <button
                       className="accept-button"
-                      onClick={() => onUpdateMembership(member.user?.id, { is_confirmed: true })}
+                      onClick={() => onApproveJoinRequest?.(member.id)}
                     >
                       Accept
                     </button>
                     <button
                       className="remove-button"
-                      onClick={() => onRemoveMember(member.user?.id)}
+                      onClick={() => onRejectJoinRequest?.(member.id)}
                     >
                       Reject
                     </button>
